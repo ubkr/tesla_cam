@@ -288,6 +288,11 @@ class TeslaDashcamApp {
         if (overlay) {
             overlay.classList.remove('hidden');
             console.log('Telemetry overlay enabled');
+            console.log('DEBUG: Overlay element:', overlay);
+            console.log('DEBUG: Overlay classes:', overlay.className);
+            console.log('DEBUG: Overlay computed display:', window.getComputedStyle(overlay).display);
+        } else {
+            console.error('DEBUG: Overlay element not found!');
         }
     }
 
@@ -311,8 +316,20 @@ class TeslaDashcamApp {
         const speedValue = document.getElementById('speedValue');
         const speedUnitEl = document.getElementById('speedUnit');
         if (speedValue && speedUnitEl) {
-            speedValue.textContent = TelemetryDecoder.formatSpeed(telemetry.speed, speedUnit);
+            const oldValue = speedValue.textContent;
+            const formattedSpeed = TelemetryDecoder.formatSpeed(telemetry.speed, speedUnit);
+            speedValue.textContent = formattedSpeed;
             speedUnitEl.textContent = speedUnit;
+            if (Math.random() < 0.1) { // Log 10% of updates to avoid spam
+                console.log('DEBUG: Speed DOM update:', {
+                    oldValue,
+                    newValue: formattedSpeed,
+                    elementExists: !!speedValue,
+                    isVisible: window.getComputedStyle(speedValue).display !== 'none'
+                });
+            }
+        } else {
+            console.error('DEBUG: Speed elements not found!', { speedValue, speedUnitEl });
         }
 
         // Update gear
