@@ -93,11 +93,6 @@ class TeslaDashcamApp {
             // Update telemetry overlay if available
             if (this.telemetryDecoder && this.telemetryDecoder.hasTelemetry()) {
                 this.updateTelemetryOverlay(data.currentTime);
-            } else {
-                console.log('DEBUG: Telemetry not available yet', {
-                    hasDecoder: !!this.telemetryDecoder,
-                    hasTelemetry: this.telemetryDecoder ? this.telemetryDecoder.hasTelemetry() : false
-                });
             }
         });
 
@@ -302,8 +297,6 @@ class TeslaDashcamApp {
     updateTelemetryOverlay(currentTime) {
         const telemetry = this.telemetryDecoder.getTelemetryAtTime(currentTime);
 
-        console.log('DEBUG updateTelemetryOverlay:', { currentTime, telemetry: !!telemetry });
-
         if (!telemetry) {
             console.warn('No telemetry data found for time:', currentTime);
             return;
@@ -386,12 +379,6 @@ class TeslaDashcamApp {
         if (gpsValue) {
             gpsValue.textContent = TelemetryDecoder.formatGPS(telemetry.gps);
         }
-
-        console.log('DEBUG: Overlay updated with values:', {
-            speed: TelemetryDecoder.formatSpeed(telemetry.speed, speedUnit),
-            gear: telemetry.gear.name,
-            autopilot: telemetry.autopilot.name
-        });
     }
 
     /**

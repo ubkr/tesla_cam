@@ -49,6 +49,15 @@ export class TelemetryDecoder {
             this.frameRate = avgFrameDuration > 0 ? 1000 / avgFrameDuration : 30;
         }
 
+        // DEBUG: Check frame sequence numbers in first few messages
+        const firstFrameNums = seiMessages.slice(0, 10).map((msg, i) => ({
+            index: i,
+            frameSeqNo: msg.frameSeqNo,
+            frame_seq_no: msg.frame_seq_no,
+            speed_mps: msg.vehicleSpeedMps || msg.vehicle_speed_mps
+        }));
+        console.log('DEBUG: First 10 SEI messages frame numbers and speeds:', firstFrameNums);
+
         // Process each SEI message
         for (let i = 0; i < seiMessages.length; i++) {
             const seiData = seiMessages[i];
@@ -66,6 +75,20 @@ export class TelemetryDecoder {
         }
 
         console.log(`Telemetry index built: ${this.telemetryIndex.size} entries`);
+
+        // DEBUG: Show first 20 entries with their data to verify variety
+        const entries = Array.from(this.telemetryIndex.entries()).slice(0, 20);
+        console.log('DEBUG: First 20 telemetry entries (timestamp -> data):');
+        entries.forEach(([timestamp, data]) => {
+            console.log(`  ${timestamp.toFixed(3)}s -> speed: ${data.speed.mph.toFixed(1)} mph, gear: ${data.gear.name}, frame: ${data.frameSeqNo}`);
+        });
+
+        // DEBUG: Show timestamp range
+        const timestamps = Array.from(this.telemetryIndex.keys());
+        const minTime = Math.min(...timestamps);
+        const maxTime = Math.max(...timestamps);
+        console.log(`DEBUG: Timestamp range: ${minTime.toFixed(3)}s to ${maxTime.toFixed(3)}s (video duration: ${duration.toFixed(3)}s)`);
+
         return this.telemetryIndex.size;
     }
 
@@ -173,15 +196,6 @@ export class TelemetryDecoder {
      * Get telemetry data for a specific video time
      */
     getTelemetryAtTime(time) {
-        // Log first call to see what timestamps we have
-        if (!this._debugLogged && this.telemetryIndex.size > 0) {
-            const timestamps = Array.from(this.telemetryIndex.keys()).slice(0, 10);
-            console.log('DEBUG: First 10 telemetry timestamps:', timestamps);
-            console.log('DEBUG: Total telemetry entries:', this.telemetryIndex.size);
-            console.log('DEBUG: Frame rate:', this.frameRate);
-            this._debugLogged = true;
-        }
-
         // Find closest timestamp
         let closestTime = null;
         let minDiff = Infinity;
@@ -200,7 +214,14 @@ export class TelemetryDecoder {
         }
 
         if (closestTime !== null) {
-            return this.telemetryIndex.get(closestTime);
+            const data = this.telemetryIndex.get(closestTime);
+
+            // DEBUG: Sample some lookups to verify we're getting different data
+            if (Math.random() < 0.05) { // Log 5% of lookups
+                console.log(`DEBUG getTelemetryAtTime: video time=${time.toFixed(3)}s -> telemetry time=${closestTime.toFixed(3)}s (diff=${minDiff.toFixed(4)}s) -> speed=${data.speed.mph.toFixed(1)} mph, frame=${data.frameSeqNo}`);
+            }
+
+            return data;
         }
 
         console.warn('DEBUG: No telemetry found for time:', time, 'closest was:', closestTime, 'minDiff:', minDiff);
