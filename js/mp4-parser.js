@@ -146,6 +146,20 @@ export class MP4Parser {
                     // Extract SEI messages
                     const seiMessages = parser.extractSeiMessages(this.SeiMetadata);
 
+                    // DEBUG: Log first SEI message to see its structure
+                    if (seiMessages.length > 0) {
+                        console.log('DEBUG: First raw SEI message from parser:', seiMessages[0]);
+                        console.log('DEBUG: First SEI message keys:', Object.keys(seiMessages[0]));
+                        console.log('DEBUG: Sample values:', {
+                            frame_seq_no: seiMessages[0].frame_seq_no,
+                            frameSeqNo: seiMessages[0].frameSeqNo,
+                            vehicle_speed_mps: seiMessages[0].vehicle_speed_mps,
+                            vehicleSpeedMps: seiMessages[0].vehicleSpeedMps,
+                            gear_state: seiMessages[0].gear_state,
+                            gearState: seiMessages[0].gearState
+                        });
+                    }
+
                     if (onProgress) onProgress({ percentage: 75, message: 'Processing telemetry...' });
 
                     // Get video config
