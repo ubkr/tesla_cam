@@ -110,7 +110,7 @@ export class MP4Parser {
                 this.worker.postMessage({
                     type: 'parse',
                     buffer: e.target.result,
-                    protoPath: 'lib/dashcam.proto'
+                    protoPath: '/lib/dashcam.proto'
                 }, [e.target.result]); // Transfer ownership of buffer to worker
             };
 

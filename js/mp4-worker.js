@@ -5,8 +5,8 @@
  */
 
 // Import dependencies (workers have their own scope)
-// Note: Paths are relative to the HTML document, not this worker file
-importScripts('lib/protobuf.min.js', 'lib/dashcam-mp4.js');
+// Use absolute paths from root for reliability
+importScripts('/lib/protobuf.min.js', '/lib/dashcam-mp4.js');
 
 let SeiMetadata = null;
 
@@ -73,7 +73,7 @@ self.onmessage = async function(e) {
         try {
             // Initialize protobuf
             postMessage({ type: 'progress', data: { percentage: 10, message: 'Initializing decoder...' } });
-            await initializeProtobuf(protoPath || 'lib/dashcam.proto');
+            await initializeProtobuf(protoPath || '/lib/dashcam.proto');
 
             // Parse MP4
             const result = parseMP4(buffer);
