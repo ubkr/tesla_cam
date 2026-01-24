@@ -42,7 +42,12 @@ export class MP4Parser {
         await this.initializeProtobuf();
 
         if (useWorker && typeof Worker !== 'undefined') {
-            return this.parseFileWithWorker(file, onProgress);
+            try {
+                return await this.parseFileWithWorker(file, onProgress);
+            } catch (error) {
+                console.warn('Worker parsing failed, falling back to direct parsing:', error.message);
+                return this.parseFileDirectly(file, onProgress);
+            }
         } else {
             return this.parseFileDirectly(file, onProgress);
         }
@@ -83,15 +88,24 @@ export class MP4Parser {
 
             this.worker.onerror = (error) => {
                 console.error('Worker error:', error);
-                this.worker.terminate();
-                this.worker = null;
-                reject(new Error('MP4 parsing failed in worker'));
+                console.warn('Worker failed to load, falling back to direct parsing');
+                if (this.worker) {
+                    this.worker.terminate();
+                    this.worker = null;
+                }
+                reject(new Error('Worker failed to load - will try direct parsing'));
             };
 
             // Read file as ArrayBuffer
             const reader = new FileReader();
 
             reader.onload = (e) => {
+                // Check if worker is still available
+                if (!this.worker) {
+                    reject(new Error('Worker was terminated before file was read'));
+                    return;
+                }
+
                 // Send data to worker
                 this.worker.postMessage({
                     type: 'parse',
