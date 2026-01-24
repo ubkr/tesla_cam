@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Browser-based Tesla dashcam viewer with synchronized telemetry overlay. View your Tesla dashcam footage with speed, Autopilot status, and vehicle data.">
+    <title>Tesla Dashcam Viewer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Tesla Dashcam Viewer</h1>
+        <p class="subtitle">View Tesla dashcam footage with synchronized telemetry data</p>
+        <button id="settingsBtn" class="icon-btn" title="Settings" aria-label="Settings">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M17.43 10.98A7.793 7.793 0 0018 8c0-1.06-.21-2.07-.57-2.98l1.53-1.53-1.41-1.41-1.53 1.53C14.07 3.21 13.06 3 12 3c-1.06 0-2.07.21-2.98.61L7.49 2.08 6.08 3.49l1.53 1.53C7.21 5.93 7 6.94 7 8c0 1.06.21 2.07.61 2.98l-1.53 1.53 1.41 1.41 1.53-1.53C9.93 12.79 10.94 13 12 13c1.06 0 2.07-.21 2.98-.61l1.53 1.53 1.41-1.41-1.53-1.53zM12 11c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/>
+            </svg>
+        </button>
+    </header>
+
+    <main>
+        <!-- File Loading Area -->
+        <section id="fileLoadSection" class="file-load-section">
+            <div id="dropZone" class="drop-zone">
+                <svg class="upload-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                </svg>
+                <h2>Drop Tesla dashcam video here</h2>
+                <p>or</p>
+                <label for="fileInput" class="file-label">
+                    <span class="btn btn-primary">Choose File</span>
+                    <input type="file" id="fileInput" accept="video/mp4" aria-label="Choose Tesla dashcam MP4 file">
+                </label>
+                <p class="hint">Supports MP4 files from Tesla vehicles with firmware 2025.44.25+ (HW3+)</p>
+                <p class="privacy-note">Files are processed locally in your browser and never uploaded</p>
+            </div>
+            <div id="fileInfo" class="file-info hidden"></div>
+        </section>
+
+        <!-- Video Player Section -->
+        <section id="videoSection" class="video-section hidden">
+            <div class="video-container">
+                <video id="videoPlayer"
+                       preload="metadata"
+                       playsinline
+                       controls
+                       aria-label="Tesla dashcam video player">
+                </video>
+
+                <!-- Telemetry Overlay -->
+                <div id="telemetryOverlay" class="telemetry-overlay hidden">
+                    <div class="overlay-header">
+                        <span id="overlayTimestamp" class="timestamp">00:00</span>
+                        <button id="toggleOverlayBtn" class="toggle-btn" aria-label="Toggle telemetry overlay">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M8 4.5a.5.5 0 01.5.5v3a.5.5 0 01-1 0V5a.5.5 0 01.5-.5zM8 11a.5.5 0 100-1 .5.5 0 000 1z"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="overlay-grid">
+                        <!-- Speed Display (Large, Prominent) -->
+                        <div class="speed-display">
+                            <div id="speedValue" class="speed-value">--</div>
+                            <div id="speedUnit" class="speed-unit">mph</div>
+                        </div>
+
+                        <!-- Gear Indicator -->
+                        <div class="gear-indicator">
+                            <span class="label">Gear</span>
+                            <span id="gearValue" class="value badge">P</span>
+                        </div>
+
+                        <!-- Turn Signals -->
+                        <div class="turn-signals">
+                            <span id="leftSignal" class="signal signal-left" aria-label="Left turn signal">◄</span>
+                            <span id="rightSignal" class="signal signal-right" aria-label="Right turn signal">►</span>
+                        </div>
+
+                        <!-- Autopilot Status -->
+                        <div class="autopilot-status">
+                            <span class="label">Autopilot</span>
+                            <span id="autopilotValue" class="value badge">OFF</span>
+                        </div>
+
+                        <!-- Steering Wheel Angle -->
+                        <div class="steering-display">
+                            <span class="label">Steering</span>
+                            <span id="steeringValue" class="value">0°</span>
+                        </div>
+
+                        <!-- Pedal Indicators -->
+                        <div class="pedal-indicators">
+                            <div class="pedal-row">
+                                <span class="label">Accelerator</span>
+                                <div class="pedal-bar">
+                                    <div id="acceleratorBar" class="bar bar-accelerator" style="width: 0%"></div>
+                                </div>
+                                <span id="acceleratorValue" class="value">0%</span>
+                            </div>
+                            <div class="pedal-row">
+                                <span class="label">Brake</span>
+                                <div class="pedal-bar">
+                                    <div id="brakeBar" class="bar bar-brake" style="width: 0%"></div>
+                                </div>
+                                <span id="brakeValue" class="value">No</span>
+                            </div>
+                        </div>
+
+                        <!-- GPS Coordinates (Optional, Hidden by Default) -->
+                        <div class="gps-display" style="display: none;">
+                            <span class="label">GPS</span>
+                            <span id="gpsValue" class="value">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Metadata -->
+            <div id="videoMetadata" class="video-metadata"></div>
+        </section>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="loading-indicator hidden">
+            <div class="spinner"></div>
+            <p id="loadingMessage">Loading...</p>
+            <div id="progressBar" class="progress-bar hidden">
+                <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Error Messages -->
+        <div id="errorContainer" class="error-container hidden">
+            <div class="error-message">
+                <svg class="error-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                </svg>
+                <div class="error-content">
+                    <h3 id="errorTitle">Error</h3>
+                    <p id="errorMessage"></p>
+                </div>
+                <button id="dismissErrorBtn" class="btn btn-secondary">Dismiss</button>
+            </div>
+        </div>
+
+        <!-- Settings Panel -->
+        <aside id="settingsPanel" class="settings-panel hidden">
+            <div class="settings-content">
+                <div class="settings-header">
+                    <h2>Settings</h2>
+                    <button id="closeSettingsBtn" class="icon-btn" aria-label="Close settings">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 8.586L15.95 2.636l1.414 1.414L11.414 10l5.95 5.95-1.414 1.414L10 11.414l-5.95 5.95-1.414-1.414L8.586 10 2.636 4.05l1.414-1.414L10 8.586z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="settings-options">
+                    <!-- Speed Unit -->
+                    <div class="setting-item">
+                        <label for="speedUnitSelect">Speed Unit</label>
+                        <select id="speedUnitSelect">
+                            <option value="mph">Miles per Hour (mph)</option>
+                            <option value="kph">Kilometers per Hour (kph)</option>
+                        </select>
+                    </div>
+
+                    <!-- Overlay Visibility -->
+                    <div class="setting-item">
+                        <label for="overlayVisibleToggle">
+                            <input type="checkbox" id="overlayVisibleToggle" checked>
+                            Show Telemetry Overlay
+                        </label>
+                    </div>
+
+                    <!-- Overlay Style -->
+                    <div class="setting-item">
+                        <label for="overlayStyleSelect">Overlay Style</label>
+                        <select id="overlayStyleSelect">
+                            <option value="detailed">Detailed</option>
+                            <option value="minimal">Minimal</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <footer>
+        <p>
+            Tesla Dashcam Viewer -
+            <a href="https://github.com/teslamotors/dashcam" target="_blank" rel="noopener">Tesla's Official Tools</a> -
+            Files processed locally, never uploaded
+        </p>
+    </footer>
+
+    <!-- Dependencies -->
+    <script src="lib/protobuf.min.js"></script>
+    <script src="lib/dashcam-mp4.js"></script>
+
+    <!-- Application Modules -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
