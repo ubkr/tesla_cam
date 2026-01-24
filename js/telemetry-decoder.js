@@ -49,15 +49,6 @@ export class TelemetryDecoder {
             this.frameRate = avgFrameDuration > 0 ? 1000 / avgFrameDuration : 30;
         }
 
-        // DEBUG: Check frame sequence numbers in first few messages
-        const firstFrameNums = seiMessages.slice(0, 10).map((msg, i) => ({
-            index: i,
-            frameSeqNo: msg.frameSeqNo,
-            frame_seq_no: msg.frame_seq_no,
-            speed_mps: msg.vehicleSpeedMps || msg.vehicle_speed_mps
-        }));
-        console.log('DEBUG: First 10 SEI messages frame numbers and speeds:', firstFrameNums);
-
         // Process each SEI message
         for (let i = 0; i < seiMessages.length; i++) {
             const seiData = seiMessages[i];
@@ -65,30 +56,17 @@ export class TelemetryDecoder {
             // Decode and convert units
             const telemetry = this.decodeSEIMessage(seiData, i);
 
-            // Calculate video timestamp from frame sequence number
-            // Use frame_seq_no if available, otherwise use index
-            const frameNumber = seiData.frameSeqNo || seiData.frame_seq_no || i;
-            const timestamp = frameNumber / this.frameRate;
+            // Calculate video timestamp from array index
+            // NOTE: frameSeqNo is a cumulative counter from the entire recording session,
+            // not the frame number within this specific video clip.
+            // We must use the array index (i) to get timestamps that align with video playback.
+            const timestamp = i / this.frameRate;
 
             // Add to index
             this.telemetryIndex.set(timestamp, telemetry);
         }
 
         console.log(`Telemetry index built: ${this.telemetryIndex.size} entries`);
-
-        // DEBUG: Show first 20 entries with their data to verify variety
-        const entries = Array.from(this.telemetryIndex.entries()).slice(0, 20);
-        console.log('DEBUG: First 20 telemetry entries (timestamp -> data):');
-        entries.forEach(([timestamp, data]) => {
-            console.log(`  ${timestamp.toFixed(3)}s -> speed: ${data.speed.mph.toFixed(1)} mph, gear: ${data.gear.name}, frame: ${data.frameSeqNo}`);
-        });
-
-        // DEBUG: Show timestamp range
-        const timestamps = Array.from(this.telemetryIndex.keys());
-        const minTime = Math.min(...timestamps);
-        const maxTime = Math.max(...timestamps);
-        console.log(`DEBUG: Timestamp range: ${minTime.toFixed(3)}s to ${maxTime.toFixed(3)}s (video duration: ${duration.toFixed(3)}s)`);
-
         return this.telemetryIndex.size;
     }
 
@@ -96,44 +74,47 @@ export class TelemetryDecoder {
      * Decode single SEI message and convert units
      */
     decodeSEIMessage(seiData, index) {
+        // NOTE: Protobuf decoder returns camelCase field names (frameSeqNo, vehicleSpeedMps, etc.)
+        // NOT snake_case (frame_seq_no, vehicle_speed_mps)
+
         // Convert speed from m/s to mph and kph
-        const speedMps = seiData.vehicleSpeedMps || seiData.vehicle_speed_mps || 0;
+        const speedMps = seiData.vehicleSpeedMps || 0;
         const speedMph = speedMps * MPS_TO_MPH;
         const speedKph = speedMps * MPS_TO_KPH;
 
         // Get steering angle
-        const steeringAngle = seiData.steeringWheelAngle || seiData.steering_wheel_angle || 0;
+        const steeringAngle = seiData.steeringWheelAngle || 0;
 
         // Get pedal positions (0-1 scale to percentage)
-        const accelerator = (seiData.acceleratorPedalPosition || seiData.accelerator_pedal_position || 0) * 100;
+        const accelerator = (seiData.acceleratorPedalPosition || 0) * 100;
 
         // Get brake status
-        const brakeApplied = seiData.brakeApplied || seiData.brake_applied || false;
+        const brakeApplied = seiData.brakeApplied || false;
 
         // Get turn signals
-        const leftSignal = seiData.blinkerOnLeft || seiData.blinker_on_left || false;
-        const rightSignal = seiData.blinkerOnRight || seiData.blinker_on_right || false;
+        const leftSignal = seiData.blinkerOnLeft || false;
+        const rightSignal = seiData.blinkerOnRight || false;
 
         // Get autopilot state
-        const autopilotState = seiData.autopilotState || seiData.autopilot_state || 0;
+        const autopilotState = seiData.autopilotState || 0;
         const autopilotName = AUTOPILOT_STATES[autopilotState] || 'OFF';
 
         // Get gear state
-        const gearState = seiData.gearState || seiData.gear_state || 0;
+        const gearState = seiData.gearState || 0;
         const gearName = GEAR_STATES[gearState] || 'P';
 
         // Get GPS coordinates
-        const latitude = seiData.latitudeDeg || seiData.latitude_deg || null;
-        const longitude = seiData.longitudeDeg || seiData.longitude_deg || null;
-        const heading = seiData.headingDeg || seiData.heading_deg || null;
+        const latitude = seiData.latitudeDeg || null;
+        const longitude = seiData.longitudeDeg || null;
+        const heading = seiData.headingDeg || null;
 
         // Get linear acceleration
-        const accelX = seiData.linearAccelerationMps2X || seiData.linear_acceleration_mps2_x || 0;
-        const accelY = seiData.linearAccelerationMps2Y || seiData.linear_acceleration_mps2_y || 0;
-        const accelZ = seiData.linearAccelerationMps2Z || seiData.linear_acceleration_mps2_z || 0;
+        const accelX = seiData.linearAccelerationMps2X || 0;
+        const accelY = seiData.linearAccelerationMps2Y || 0;
+        const accelZ = seiData.linearAccelerationMps2Z || 0;
 
         // Get frame sequence number
-        const frameSeqNo = seiData.frameSeqNo || seiData.frame_seq_no || index;
+        const frameSeqNo = seiData.frameSeqNo || index;
 
         return {
             // Speed (multiple units for convenience)
@@ -214,17 +195,9 @@ export class TelemetryDecoder {
         }
 
         if (closestTime !== null) {
-            const data = this.telemetryIndex.get(closestTime);
-
-            // DEBUG: Sample some lookups to verify we're getting different data
-            if (Math.random() < 0.05) { // Log 5% of lookups
-                console.log(`DEBUG getTelemetryAtTime: video time=${time.toFixed(3)}s -> telemetry time=${closestTime.toFixed(3)}s (diff=${minDiff.toFixed(4)}s) -> speed=${data.speed.mph.toFixed(1)} mph, frame=${data.frameSeqNo}`);
-            }
-
-            return data;
+            return this.telemetryIndex.get(closestTime);
         }
 
-        console.warn('DEBUG: No telemetry found for time:', time, 'closest was:', closestTime, 'minDiff:', minDiff);
         return null;
     }
 

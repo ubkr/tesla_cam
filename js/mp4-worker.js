@@ -43,18 +43,6 @@ function parseMP4(buffer) {
         // Extract SEI messages
         const seiMessages = parser.extractSeiMessages(SeiMetadata);
 
-        // DEBUG: Log first SEI message to see its structure
-        if (seiMessages.length > 0) {
-            console.log('DEBUG Worker: First raw SEI message from parser:', seiMessages[0]);
-            console.log('DEBUG Worker: First SEI message keys:', Object.keys(seiMessages[0]));
-            console.log('DEBUG Worker: Sample values:', {
-                frame_seq_no: seiMessages[0].frame_seq_no,
-                frameSeqNo: seiMessages[0].frameSeqNo,
-                vehicle_speed_mps: seiMessages[0].vehicle_speed_mps,
-                vehicleSpeedMps: seiMessages[0].vehicleSpeedMps
-            });
-        }
-
         // Update progress
         postMessage({ type: 'progress', data: { percentage: 75, message: 'Processing metadata...' } });
 
