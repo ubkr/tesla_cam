@@ -173,6 +173,15 @@ export class TelemetryDecoder {
      * Get telemetry data for a specific video time
      */
     getTelemetryAtTime(time) {
+        // Log first call to see what timestamps we have
+        if (!this._debugLogged && this.telemetryIndex.size > 0) {
+            const timestamps = Array.from(this.telemetryIndex.keys()).slice(0, 10);
+            console.log('DEBUG: First 10 telemetry timestamps:', timestamps);
+            console.log('DEBUG: Total telemetry entries:', this.telemetryIndex.size);
+            console.log('DEBUG: Frame rate:', this.frameRate);
+            this._debugLogged = true;
+        }
+
         // Find closest timestamp
         let closestTime = null;
         let minDiff = Infinity;
@@ -194,6 +203,7 @@ export class TelemetryDecoder {
             return this.telemetryIndex.get(closestTime);
         }
 
+        console.warn('DEBUG: No telemetry found for time:', time, 'closest was:', closestTime, 'minDiff:', minDiff);
         return null;
     }
 
