@@ -1,0 +1,22 @@
+# Tesla dashcam video files (sample data)
+*.mp4
+
+# macOS
+.DS_Store
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node modules if added later
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Logs
+*.log
