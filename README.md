@@ -216,14 +216,15 @@ Contributions welcome! Please feel free to submit issues or pull requests.
 
 ## Roadmap
 
-Future enhancements planned:
+See [ROADMAP.md](ROADMAP.md) for the complete list of planned features and enhancements.
+
+**Highlights of upcoming features:**
 - Multi-camera synchronization (play all 4-6 cameras simultaneously)
 - Telemetry data export (CSV, JSON)
 - Video timeline with speed/event markers
-- Keyboard shortcuts for playback control
-- Dark mode theme
-- Enhanced map features (satellite view, speed markers, custom car icon with rotation)
-- Event detection (hard braking, sharp turns)
+- Enhanced map features (satellite view, speed heatmap, custom car icon)
+- Keyboard shortcuts and dark mode
+- Event detection (hard braking, sharp turns, autopilot changes)
 
 ## Support
 

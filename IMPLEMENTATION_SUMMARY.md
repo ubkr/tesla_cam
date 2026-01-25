@@ -252,17 +252,19 @@ A sample Tesla dashcam video is included:
 
 ## What's NOT Included (Future Enhancements)
 
-The following were mentioned in the plan but deferred to Phase 2:
-- ❌ Multi-camera synchronization (future)
-- ❌ CSV export of telemetry data (future)
-- ❌ Video timeline with markers (future)
-- ❌ Keyboard shortcuts (future)
-- ❌ Dark mode theme (future)
-- ❌ Custom overlay layouts (future)
-
 ✅ **Route visualization on map** - IMPLEMENTED in v1.1.0
 
-These are planned enhancements but not required for MVP.
+**Planned for future releases** (see [ROADMAP.md](ROADMAP.md) for details):
+- ❌ Multi-camera synchronization (v1.2.0)
+- ❌ CSV/JSON export of telemetry data (v1.2.0)
+- ❌ Video timeline with event markers (v1.3.0)
+- ❌ Enhanced map features (satellite view, speed heatmap) (v1.3.0)
+- ❌ Keyboard shortcuts (v1.3.0)
+- ❌ Dark mode theme (v1.4.0)
+- ❌ Event detection (v1.4.0)
+- ❌ Custom overlay layouts (v1.4.0)
+
+See [ROADMAP.md](ROADMAP.md) for the complete feature roadmap with priorities and target releases.
 
 ---
 

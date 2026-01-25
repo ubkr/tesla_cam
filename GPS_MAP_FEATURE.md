@@ -112,3 +112,14 @@ Map initialized with GPS route
 **Feature**: GPS Map Integration
 **Version**: 1.1.0
 **Date**: January 25, 2026
+
+## Future Map Enhancements
+
+See [ROADMAP.md](ROADMAP.md) section "Enhanced Map Features" for planned improvements:
+- Satellite/terrain view options
+- Custom car icon with heading rotation
+- Speed heatmap along route
+- Route statistics (distance, max speed)
+- Auto-pan to keep position centered
+- Click route to jump video to that location
+
