@@ -14,6 +14,12 @@ A browser-based viewer for Tesla dashcam footage with synchronized telemetry ove
   - Accelerator pedal position
   - Brake status
   - GPS coordinates
+- **GPS Map View**: Interactive map showing vehicle route and current position
+  - Complete route path displayed on map
+  - Real-time position marker synchronized with video playback
+  - Interactive controls (zoom, pan)
+  - Uses OpenStreetMap tiles (no API key required)
+  - Side-by-side layout on desktop, stacked on mobile
 - **Privacy First**: All processing happens locally in your browser - files never leave your computer
 - **No Installation**: Works directly in modern web browsers, no software to install
 - **Responsive Design**: Works on desktop, tablet, and mobile devices
@@ -192,6 +198,7 @@ Your dashcam footage never leaves your computer.
 - **protobuf.js** (v7.2.5): Protocol Buffer library for JavaScript
 - **dashcam-mp4.js**: Tesla's official MP4 parser (from [teslamotors/dashcam](https://github.com/teslamotors/dashcam))
 - **dashcam.proto**: Protocol Buffer schema defining telemetry structure
+- **Leaflet.js** (v1.9.4): Interactive maps library for GPS route visualization
 
 ## Credits
 
@@ -215,7 +222,7 @@ Future enhancements planned:
 - Video timeline with speed/event markers
 - Keyboard shortcuts for playback control
 - Dark mode theme
-- Route visualization on map
+- Enhanced map features (satellite view, speed markers, custom car icon with rotation)
 - Event detection (hard braking, sharp turns)
 
 ## Support
@@ -227,5 +234,5 @@ For issues or questions:
 
 ## Version
 
-**Version**: 1.0.0 (MVP)
+**Version**: 1.1.0 (GPS Map Integration)
 **Last Updated**: January 2026

@@ -139,15 +139,37 @@ main {
     margin-top: 2rem;
 }
 
+/* Video Wrapper - Grid Layout for Video + Map */
+.video-wrapper {
+    display: grid;
+    grid-template-columns: 65% 35%;
+    gap: 1rem;
+    width: 100%;
+    margin: 0 auto;
+}
+
 .video-container {
     position: relative;
     width: 100%;
-    max-width: 1280px;
-    margin: 0 auto;
     background-color: black;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: var(--shadow-lg);
+}
+
+/* Map Container */
+.map-container {
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    height: 100%;
+    min-height: 480px;
+}
+
+#mapContainer {
+    width: 100%;
+    height: 100%;
 }
 
 video {
@@ -589,6 +611,16 @@ footer a:hover {
 
     .drop-zone h2 {
         font-size: 1.25rem;
+    }
+
+    /* Stack video and map on mobile */
+    .video-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .map-container {
+        height: 400px;
+        min-height: 300px;
     }
 
     .overlay-grid {

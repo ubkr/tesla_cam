@@ -1,8 +1,8 @@
-# Implementation Summary - Tesla Dashcam Viewer MVP
+# Implementation Summary - Tesla Dashcam Viewer
 
-## Status: ✅ COMPLETE
+## Status: ✅ COMPLETE (v1.1.0 - GPS Map Integration)
 
-All planned features have been implemented and the Tesla Dashcam Viewer MVP is ready for use and testing.
+All planned features have been implemented including the new GPS map integration. The Tesla Dashcam Viewer is ready for use and testing.
 
 ---
 
@@ -77,6 +77,17 @@ Created core application structure:
 - Set up local development server
 - Application ready for manual testing
 
+### Phase 9: GPS Map Integration ✅ (v1.1.0)
+- **js/map-controller.js**: New module for map functionality
+- Integrated Leaflet.js via CDN (v1.9.4)
+- OpenStreetMap tiles (free, no API key required)
+- Real-time position marker synchronized with video playback
+- Complete route path displayed as blue polyline
+- Responsive layout: side-by-side on desktop, stacked on mobile
+- Auto-zoom to fit entire route
+- Handles videos without GPS data gracefully
+- Updated documentation (README.md)
+
 ---
 
 ## File Structure
@@ -92,7 +103,8 @@ tesla_cam/
 │   ├── mp4-parser.js             # MP4 parsing wrapper
 │   ├── mp4-worker.js             # Web Worker for parsing
 │   ├── telemetry-decoder.js      # Protobuf decoding & indexing
-│   └── settings.js               # Settings management
+│   ├── settings.js               # Settings management
+│   └── map-controller.js         # GPS map functionality (NEW in v1.1.0)
 ├── lib/
 │   ├── protobuf.min.js           # Protocol Buffers library
 │   ├── dashcam-mp4.js            # Tesla's MP4 parser
@@ -172,6 +184,14 @@ A sample Tesla dashcam video is included:
 - ✅ GPS coordinates
 - ✅ Timestamp
 
+### GPS Map View ✅ (NEW in v1.1.0)
+- ✅ Interactive map with OpenStreetMap tiles
+- ✅ Complete route path displayed as polyline
+- ✅ Real-time position marker synchronized with video
+- ✅ Auto-zoom to show entire route
+- ✅ Responsive layout (side-by-side on desktop, stacked on mobile)
+- ✅ Graceful handling of videos without GPS data
+
 ### Settings ✅
 - ✅ Speed unit toggle (mph/kph)
 - ✅ Overlay visibility toggle
@@ -238,8 +258,9 @@ The following were mentioned in the plan but deferred to Phase 2:
 - ❌ Video timeline with markers (future)
 - ❌ Keyboard shortcuts (future)
 - ❌ Dark mode theme (future)
-- ❌ Route visualization on map (future)
 - ❌ Custom overlay layouts (future)
+
+✅ **Route visualization on map** - IMPLEMENTED in v1.1.0
 
 These are planned enhancements but not required for MVP.
 
@@ -327,9 +348,9 @@ The application is now ready for real-world use and testing with actual Tesla da
 
 ---
 
-**Built with**: Vanilla JavaScript, ES6 Modules, HTML5, CSS3, Web Workers, Protocol Buffers
+**Built with**: Vanilla JavaScript, ES6 Modules, HTML5, CSS3, Web Workers, Protocol Buffers, Leaflet.js
 
-**Credits**: Tesla for open-source dashcam tools, protobuf.js library
+**Credits**: Tesla for open-source dashcam tools, protobuf.js library, Leaflet.js and OpenStreetMap contributors
 
-**Version**: 1.0.0 MVP
-**Date**: January 24, 2026
+**Version**: 1.1.0 (GPS Map Integration)
+**Date**: January 25, 2026

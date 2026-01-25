@@ -8,6 +8,7 @@ import { VideoPlayer } from './video-player.js';
 import { MP4Parser } from './mp4-parser.js';
 import { TelemetryDecoder } from './telemetry-decoder.js';
 import { Settings } from './settings.js';
+import { MapController } from './map-controller.js';
 
 class TeslaDashcamApp {
     constructor() {
@@ -16,6 +17,7 @@ class TeslaDashcamApp {
         this.mp4Parser = null;
         this.telemetryDecoder = null;
         this.settings = null;
+        this.mapController = null;
         this.currentFile = null;
         this.telemetryData = null;
 
@@ -92,7 +94,18 @@ class TeslaDashcamApp {
 
             // Update telemetry overlay if available
             if (this.telemetryDecoder && this.telemetryDecoder.hasTelemetry()) {
+                const telemetry = this.telemetryDecoder.getTelemetryAtTime(data.currentTime);
+
                 this.updateTelemetryOverlay(data.currentTime);
+
+                // Update map position
+                if (this.mapController && telemetry && telemetry.gps.isValid) {
+                    this.mapController.updatePosition(
+                        telemetry.gps.latitude,
+                        telemetry.gps.longitude,
+                        telemetry.gps.heading
+                    );
+                }
             }
         });
 
@@ -212,6 +225,9 @@ class TeslaDashcamApp {
 
                     // Show telemetry overlay
                     this.showTelemetryOverlay();
+
+                    // Initialize map with GPS data
+                    this.initializeMap();
 
                     // Log statistics
                     const stats = this.telemetryDecoder.getStatistics();
@@ -387,6 +403,49 @@ class TeslaDashcamApp {
     }
 
     /**
+     * Initialize map with GPS data
+     */
+    initializeMap() {
+        if (!this.telemetryDecoder || !this.telemetryDecoder.hasTelemetry()) {
+            console.warn('No telemetry data available for map');
+            return;
+        }
+
+        // Get all telemetry data
+        const allTelemetry = this.telemetryDecoder.getAllTelemetry();
+
+        // Find first valid GPS coordinate
+        const firstValid = allTelemetry.find(t => t.gps && t.gps.isValid);
+
+        if (!firstValid) {
+            console.warn('No valid GPS data found in telemetry');
+            // Hide map container
+            const mapContainer = document.getElementById('mapContainer');
+            if (mapContainer) {
+                mapContainer.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666; font-size: 0.9rem; text-align: center; padding: 2rem;">GPS data not available in this video</div>';
+            }
+            return;
+        }
+
+        // Initialize map controller
+        this.mapController = new MapController('mapContainer');
+        const initialized = this.mapController.initialize(
+            firstValid.gps.latitude,
+            firstValid.gps.longitude
+        );
+
+        if (!initialized) {
+            console.error('Failed to initialize map');
+            return;
+        }
+
+        // Build route from all telemetry
+        this.mapController.buildRouteFromTelemetry(allTelemetry);
+
+        console.log('Map initialized with GPS route');
+    }
+
+    /**
      * Show loading indicator
      */
     showLoading(message = 'Loading...') {
@@ -459,6 +518,12 @@ class TeslaDashcamApp {
         this.fileLoader.reset();
         this.currentFile = null;
         this.telemetryData = null;
+
+        // Clean up map
+        if (this.mapController) {
+            this.mapController.destroy();
+            this.mapController = null;
+        }
 
         this.elements.videoSection.classList.add('hidden');
         this.elements.fileLoadSection.classList.remove('hidden');

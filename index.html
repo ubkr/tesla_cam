@@ -6,6 +6,7 @@
     <meta name="description" content="Browser-based Tesla dashcam viewer with synchronized telemetry overlay. View your Tesla dashcam footage with speed, Autopilot status, and vehicle data.">
     <title>Tesla Dashcam Viewer</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -40,16 +41,17 @@
 
         <!-- Video Player Section -->
         <section id="videoSection" class="video-section hidden">
-            <div class="video-container">
-                <video id="videoPlayer"
-                       preload="metadata"
-                       playsinline
-                       controls
-                       aria-label="Tesla dashcam video player">
-                </video>
+            <div class="video-wrapper">
+                <div class="video-container">
+                    <video id="videoPlayer"
+                           preload="metadata"
+                           playsinline
+                           controls
+                           aria-label="Tesla dashcam video player">
+                    </video>
 
-                <!-- Telemetry Overlay -->
-                <div id="telemetryOverlay" class="telemetry-overlay hidden">
+                    <!-- Telemetry Overlay -->
+                    <div id="telemetryOverlay" class="telemetry-overlay hidden">
                     <div class="overlay-header">
                         <span id="overlayTimestamp" class="timestamp">00:00</span>
                         <button id="toggleOverlayBtn" class="toggle-btn" aria-label="Toggle telemetry overlay">
@@ -116,6 +118,12 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Map Container -->
+            <div id="mapContainer" class="map-container">
+                <!-- Leaflet map will mount here -->
+            </div>
+        </div>
 
             <!-- Video Metadata -->
             <div id="videoMetadata" class="video-metadata"></div>
@@ -198,6 +206,7 @@
     <!-- Dependencies -->
     <script src="lib/protobuf.min.js"></script>
     <script src="lib/dashcam-mp4.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <!-- Application Modules -->
     <script type="module" src="js/app.js"></script>
