@@ -187,12 +187,41 @@ export class Settings {
      * Apply overlay visibility
      */
     applyOverlayVisibility() {
-        const overlay = document.getElementById('telemetryOverlay');
-        if (overlay) {
+        const overlayGrid = document.querySelector('.overlay-grid');
+        if (overlayGrid) {
             if (this.settings.overlayVisible) {
-                overlay.style.display = '';
+                overlayGrid.classList.remove('hidden');
             } else {
-                overlay.style.display = 'none';
+                overlayGrid.classList.add('hidden');
+            }
+        }
+
+        // Update toggle button icon
+        this.updateToggleButtonIcon();
+    }
+
+    /**
+     * Update toggle button icon to match current visibility state
+     */
+    updateToggleButtonIcon() {
+        const toggleBtn = document.getElementById('toggleOverlayBtn');
+        if (toggleBtn) {
+            if (this.settings.overlayVisible) {
+                // Eye icon (visible state)
+                toggleBtn.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 3c-3.5 0-6.5 2.5-7.5 5.5 1 3 4 5.5 7.5 5.5s6.5-2.5 7.5-5.5C14.5 5.5 11.5 3 8 3zm0 9c-2 0-3.5-1.5-3.5-3.5S6 5 8 5s3.5 1.5 3.5 3.5S10 12 8 12zm0-6c-1.4 0-2.5 1.1-2.5 2.5S6.6 11 8 11s2.5-1.1 2.5-2.5S9.4 6 8 6z"/>
+                    </svg>
+                `;
+                toggleBtn.title = 'Hide telemetry overlay';
+            } else {
+                // Eye-slash icon (hidden state)
+                toggleBtn.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M13.5 8.5c-.5 1-1.2 1.8-2 2.4l1.4 1.4c1-1 1.8-2.2 2.3-3.3-1-3-4-5.5-7.5-5.5-1 0-1.9.2-2.8.5l1.5 1.5c.4-.1.8-.2 1.3-.2 2 0 3.5 1.5 3.5 3.5 0 .4-.1.9-.2 1.3l1.5 1.5zm-5.5 3.3c-2 0-3.5-1.5-3.5-3.5 0-.5.1-.9.2-1.3L1.3 3.7l1-1 11 11-1 1-2.3-2.3c-.8.3-1.7.4-2.5.4zm-2-3.5c0 1.1.9 2 2 2l-2-2z"/>
+                    </svg>
+                `;
+                toggleBtn.title = 'Show telemetry overlay';
             }
         }
     }

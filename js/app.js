@@ -115,6 +115,14 @@ class TeslaDashcamApp {
             this.toggleSettings();
         });
 
+        // Toggle overlay button
+        const toggleOverlayBtn = document.getElementById('toggleOverlayBtn');
+        if (toggleOverlayBtn) {
+            toggleOverlayBtn.addEventListener('click', () => {
+                this.toggleTelemetryOverlayVisibility();
+            });
+        }
+
         // Dismiss error button
         this.elements.dismissErrorBtn.addEventListener('click', () => {
             this.hideError();
@@ -284,6 +292,17 @@ class TeslaDashcamApp {
             overlay.classList.remove('hidden');
             console.log('Telemetry overlay enabled');
         }
+    }
+
+    /**
+     * Toggle telemetry overlay visibility (hide/show the data grid)
+     */
+    toggleTelemetryOverlayVisibility() {
+        // Get current visibility state
+        const currentlyVisible = this.settings.get('overlayVisible');
+
+        // Toggle it via settings (which will handle DOM updates and icon changes)
+        this.settings.setOverlayVisible(!currentlyVisible);
     }
 
     /**
