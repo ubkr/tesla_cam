@@ -107,22 +107,13 @@ class TeslaDashcamApp {
      */
     setupUIEventListeners() {
         // Settings button
-        console.log('Setting up event listeners. Settings button:', this.elements.settingsBtn);
-        if (this.elements.settingsBtn) {
-            this.elements.settingsBtn.addEventListener('click', () => {
-                console.log('Settings button clicked!');
-                this.toggleSettings();
-            });
-        } else {
-            console.error('Settings button not found!');
-        }
+        this.elements.settingsBtn.addEventListener('click', () => {
+            this.toggleSettings();
+        });
 
-        if (this.elements.closeSettingsBtn) {
-            this.elements.closeSettingsBtn.addEventListener('click', () => {
-                console.log('Close settings button clicked!');
-                this.toggleSettings();
-            });
-        }
+        this.elements.closeSettingsBtn.addEventListener('click', () => {
+            this.toggleSettings();
+        });
 
         // Dismiss error button
         this.elements.dismissErrorBtn.addEventListener('click', () => {
@@ -431,10 +422,9 @@ class TeslaDashcamApp {
      * Toggle settings panel
      */
     toggleSettings() {
-        console.log('toggleSettings called. Panel:', this.elements.settingsPanel);
-        console.log('Panel classes before toggle:', this.elements.settingsPanel?.className);
+        // Remove 'hidden' class and toggle 'visible' class
+        this.elements.settingsPanel.classList.remove('hidden');
         this.elements.settingsPanel.classList.toggle('visible');
-        console.log('Panel classes after toggle:', this.elements.settingsPanel?.className);
     }
 
     /**
