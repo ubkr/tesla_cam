@@ -303,7 +303,6 @@ class TeslaDashcamApp {
     toggleTelemetryOverlayVisibility() {
         // Get current visibility state
         const currentlyVisible = this.settings.get('overlayVisible');
-        console.log('Toggle clicked. Current visibility:', currentlyVisible, 'New visibility:', !currentlyVisible);
 
         // Toggle it via settings (which will handle DOM updates and icon changes)
         this.settings.setOverlayVisible(!currentlyVisible);
