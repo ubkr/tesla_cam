@@ -291,6 +291,9 @@ class TeslaDashcamApp {
         if (overlay) {
             overlay.classList.remove('hidden');
             console.log('Telemetry overlay enabled');
+
+            // Apply saved visibility preference (whether to show/hide the data grid)
+            this.settings.applyOverlayVisibility();
         }
     }
 
