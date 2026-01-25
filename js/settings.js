@@ -148,10 +148,20 @@ export class Settings {
      * Set overlay visibility
      */
     setOverlayVisible(visible) {
+        console.log('setOverlayVisible called with:', visible);
         this.settings.overlayVisible = visible;
         this.saveSettings();
 
         this.applyOverlayVisibility();
+
+        // Update checkbox in settings panel
+        const checkbox = document.getElementById('overlayVisibleToggle');
+        if (checkbox) {
+            checkbox.checked = visible;
+            console.log('Checkbox updated to:', visible);
+        } else {
+            console.warn('Checkbox not found!');
+        }
 
         // Trigger callback
         if (this.callbacks.onOverlayVisibilityChange) {
@@ -188,12 +198,18 @@ export class Settings {
      */
     applyOverlayVisibility() {
         const overlayGrid = document.querySelector('.overlay-grid');
+        console.log('applyOverlayVisibility called. Visible:', this.settings.overlayVisible, 'Grid:', overlayGrid);
+
         if (overlayGrid) {
             if (this.settings.overlayVisible) {
                 overlayGrid.classList.remove('hidden');
+                console.log('Grid shown (removed hidden class)');
             } else {
                 overlayGrid.classList.add('hidden');
+                console.log('Grid hidden (added hidden class)');
             }
+        } else {
+            console.error('Overlay grid not found!');
         }
 
         // Update toggle button icon
@@ -205,6 +221,8 @@ export class Settings {
      */
     updateToggleButtonIcon() {
         const toggleBtn = document.getElementById('toggleOverlayBtn');
+        console.log('updateToggleButtonIcon called. Visible:', this.settings.overlayVisible, 'Button:', toggleBtn);
+
         if (toggleBtn) {
             if (this.settings.overlayVisible) {
                 // Eye icon (visible state)
@@ -214,6 +232,7 @@ export class Settings {
                     </svg>
                 `;
                 toggleBtn.title = 'Hide telemetry overlay';
+                console.log('Icon set to: EYE (visible)');
             } else {
                 // Eye-slash icon (hidden state)
                 toggleBtn.innerHTML = `
@@ -222,7 +241,10 @@ export class Settings {
                     </svg>
                 `;
                 toggleBtn.title = 'Show telemetry overlay';
+                console.log('Icon set to: EYE-SLASH (hidden)');
             }
+        } else {
+            console.error('Toggle button not found!');
         }
     }
 
