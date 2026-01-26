@@ -6,8 +6,8 @@ This document consolidates all planned future enhancements for the Tesla Dashcam
 
 ## Current Version
 
-**Version**: 1.1.0 (GPS Map Integration)
-**Date**: January 25, 2026
+**Version**: 1.2.0 (Timeline & Event Markers)
+**Date**: January 26, 2026
 
 ### Completed Features ✅
 
@@ -25,13 +25,53 @@ This document consolidates all planned future enhancements for the Tesla Dashcam
 - Real-time position tracking synchronized with video
 - Responsive map layout (side-by-side on desktop, stacked on mobile)
 
+**Phase 3 - Timeline & Events (v1.2.0):**
+- Interactive video timeline with speed graph visualization
+- 6 event types with color-coded markers (hard braking, brake usage, sharp turns, autopilot changes, rapid acceleration, high speed)
+- Click/drag to seek and scrub through video
+- Hover tooltips showing telemetry data
+- Settings integration for timeline visibility
+- Mobile-responsive design with performance optimizations
+
 ---
 
 ## Planned Enhancements
 
-### High Priority (Next Release - v1.2.0)
+### High Priority (Next Release - v1.3.0)
 
-#### 1. Multi-Camera Synchronization
+#### 1. Reposition Telemetry Overlay
+**Status**: Planned
+**Complexity**: Low
+**Description**: Move telemetry dashboard from video overlay to dedicated panel
+- Remove telemetry overlay from covering the video
+- Position dashboard to the right, above the GPS map
+- Maintain responsive layout (stack vertically on mobile)
+- Keep same telemetry data and styling
+- Ensure dashboard remains synchronized with video playback
+
+**Layout Changes**:
+```
+Desktop:                      Mobile:
+┌──────────┬────────┐        ┌──────────┐
+│          │Teleme- │        │  Video   │
+│  Video   │  try   │        ├──────────┤
+│          │Dashboard│       │Dashboard │
+│          ├────────┤        ├──────────┤
+│          │  Map   │        │   Map    │
+├──────────┴────────┤        ├──────────┤
+│     Timeline      │        │ Timeline │
+└───────────────────┘        └──────────┘
+```
+
+**Benefits**:
+- Unobstructed video viewing
+- Better use of screen real estate
+- Clearer dashboard visibility
+- More professional layout
+
+---
+
+#### 2. Multi-Camera Synchronization
 **Status**: Planned
 **Complexity**: High
 **Description**: Simultaneously play all 4-6 camera angles from a single event
@@ -54,7 +94,7 @@ This document consolidates all planned future enhancements for the Tesla Dashcam
 
 ---
 
-#### 2. Telemetry Data Export
+#### 3. Telemetry Data Export
 **Status**: Planned
 **Complexity**: Medium
 **Description**: Export telemetry data to standard formats
@@ -78,31 +118,7 @@ timestamp,speed_mph,gear,autopilot,latitude,longitude,heading
 
 ---
 
-#### 3. Video Timeline with Markers
-**Status**: Planned
-**Complexity**: Medium
-**Description**: Enhanced timeline with visual event markers
-- Speed graph overlay on timeline
-- Event markers (hard braking, sharp turns, autopilot engage/disengage)
-- Hoverable timeline showing telemetry preview
-- Click to jump to specific events
-- Customizable marker types and thresholds
-
-**Visual Design**:
-```
-Timeline: ═══════════════════════════════════════
-Speed:    ▁▂▃▅▆▇█▇▆▅▄▃▂▁ (miniature graph)
-Events:      🛑      ⚡        🔄    (icons)
-```
-
-**Benefits**:
-- Quick navigation to interesting moments
-- Visual summary of drive
-- Easier event detection and analysis
-
----
-
-### Medium Priority (v1.3.0 - v1.4.0)
+### Medium Priority (v1.4.0 - v1.5.0)
 
 #### 4. Enhanced Map Features
 **Status**: Partially implemented (basic map in v1.1.0)
@@ -331,18 +347,21 @@ Track feature requests from users:
 
 ## Release Schedule (Tentative)
 
-**v1.2.0** (Q1 2026):
+**v1.2.0** (Q1 2026): ✅ COMPLETED
+- Video timeline with event markers
+- 6 event types with interactive features
+
+**v1.3.0** (Q1 2026):
+- Reposition telemetry overlay
 - Multi-camera synchronization
 - Telemetry data export (CSV/JSON)
 
-**v1.3.0** (Q2 2026):
-- Video timeline with event markers
+**v1.4.0** (Q2 2026):
 - Enhanced map features
 - Keyboard shortcuts
 
-**v1.4.0** (Q3 2026):
+**v1.5.0** (Q3 2026):
 - Dark mode theme
-- Event detection
 - Custom overlay layouts
 
 **v2.0.0** (Q4 2026):
@@ -372,13 +391,14 @@ Have ideas for new features? Please:
 
 ---
 
-**Document Version**: 1.0
-**Last Updated**: January 25, 2026
+**Document Version**: 1.1
+**Last Updated**: January 26, 2026
 **Maintained By**: Project contributors
 
 ---
 
 ## Version History
 
+- **v1.2.0** (Jan 2026): Video timeline with event markers ✅
 - **v1.1.0** (Jan 2026): GPS map integration ✅
 - **v1.0.0** (Jan 2026): MVP release with single camera playback and telemetry overlay ✅
