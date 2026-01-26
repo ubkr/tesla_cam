@@ -366,6 +366,43 @@ video {
     text-align: center;
 }
 
+/* Custom Timeline */
+.custom-timeline {
+    position: relative;
+    width: 100%;
+    height: 80px;
+    background: rgba(0, 0, 0, 0.85);
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.timeline-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.timeline-tooltip {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.95);
+    color: white;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    pointer-events: none;
+    z-index: 1000;
+    box-shadow: var(--shadow-lg);
+    min-width: 180px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+}
+
+.timeline-tooltip div {
+    margin: 0.25rem 0;
+}
+
 /* Video Metadata */
 .video-metadata {
     background-color: white;
@@ -639,6 +676,18 @@ footer a:hover {
 
     .pedal-indicators {
         grid-column: span 1;
+    }
+
+    /* Timeline on mobile */
+    .custom-timeline {
+        height: 60px;
+        margin-top: 0.5rem;
+    }
+
+    .timeline-tooltip {
+        font-size: 0.75rem;
+        padding: 0.5rem;
+        min-width: 150px;
     }
 
     .settings-panel {

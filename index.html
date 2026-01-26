@@ -125,6 +125,12 @@
             </div>
         </div>
 
+            <!-- Custom Timeline with Event Markers -->
+            <div id="customTimeline" class="custom-timeline hidden">
+                <canvas id="timelineCanvas" class="timeline-canvas"></canvas>
+                <div id="timelineTooltip" class="timeline-tooltip hidden"></div>
+            </div>
+
             <!-- Video Metadata -->
             <div id="videoMetadata" class="video-metadata"></div>
         </section>
@@ -189,6 +195,14 @@
                             <option value="detailed">Detailed</option>
                             <option value="minimal">Minimal</option>
                         </select>
+                    </div>
+
+                    <!-- Timeline Visibility -->
+                    <div class="setting-item">
+                        <label for="timelineVisibleToggle">
+                            <input type="checkbox" id="timelineVisibleToggle" checked>
+                            Show Video Timeline
+                        </label>
                     </div>
                 </div>
             </div>

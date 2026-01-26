@@ -6,7 +6,8 @@
 const DEFAULT_SETTINGS = {
     speedUnit: 'mph',
     overlayVisible: true,
-    overlayStyle: 'detailed'
+    overlayStyle: 'detailed',
+    timelineVisible: true
 };
 
 export class Settings {
@@ -15,7 +16,8 @@ export class Settings {
         this.callbacks = {
             onSpeedUnitChange: null,
             onOverlayVisibilityChange: null,
-            onOverlayStyleChange: null
+            onOverlayStyleChange: null,
+            onTimelineVisibilityChange: null
         };
     }
 
@@ -90,6 +92,14 @@ export class Settings {
                 this.setOverlayStyle(e.target.value);
             });
         }
+
+        // Timeline visibility toggle
+        const timelineVisibleToggle = document.getElementById('timelineVisibleToggle');
+        if (timelineVisibleToggle) {
+            timelineVisibleToggle.addEventListener('change', (e) => {
+                this.setTimelineVisible(e.target.checked);
+            });
+        }
     }
 
     /**
@@ -114,11 +124,20 @@ export class Settings {
             overlayStyleSelect.value = this.settings.overlayStyle;
         }
 
+        // Timeline visibility
+        const timelineVisibleToggle = document.getElementById('timelineVisibleToggle');
+        if (timelineVisibleToggle) {
+            timelineVisibleToggle.checked = this.settings.timelineVisible;
+        }
+
         // Apply overlay visibility to actual overlay
         this.applyOverlayVisibility();
 
         // Apply overlay style
         this.applyOverlayStyle();
+
+        // Apply timeline visibility
+        this.applyTimelineVisibility();
     }
 
     /**
@@ -246,6 +265,43 @@ export class Settings {
     }
 
     /**
+     * Set timeline visibility
+     */
+    setTimelineVisible(visible) {
+        this.settings.timelineVisible = visible;
+        this.saveSettings();
+
+        this.applyTimelineVisibility();
+
+        // Update checkbox in settings panel
+        const checkbox = document.getElementById('timelineVisibleToggle');
+        if (checkbox) {
+            checkbox.checked = visible;
+        }
+
+        // Trigger callback
+        if (this.callbacks.onTimelineVisibilityChange) {
+            this.callbacks.onTimelineVisibilityChange(visible);
+        }
+
+        console.log('Timeline visibility changed to:', visible);
+    }
+
+    /**
+     * Apply timeline visibility
+     */
+    applyTimelineVisibility() {
+        const timeline = document.getElementById('customTimeline');
+        if (timeline) {
+            if (this.settings.timelineVisible) {
+                timeline.classList.remove('hidden');
+            } else {
+                timeline.classList.add('hidden');
+            }
+        }
+    }
+
+    /**
      * Get current settings
      */
     get(key) {
@@ -278,6 +334,13 @@ export class Settings {
      */
     onOverlayStyleChange(callback) {
         this.callbacks.onOverlayStyleChange = callback;
+    }
+
+    /**
+     * Register callback for timeline visibility changes
+     */
+    onTimelineVisibilityChange(callback) {
+        this.callbacks.onTimelineVisibilityChange = callback;
     }
 
     /**

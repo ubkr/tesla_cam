@@ -9,6 +9,7 @@ import { MP4Parser } from './mp4-parser.js';
 import { TelemetryDecoder } from './telemetry-decoder.js';
 import { Settings } from './settings.js';
 import { MapController } from './map-controller.js';
+import { TimelineController } from './timeline-controller.js';
 
 class TeslaDashcamApp {
     constructor() {
@@ -18,6 +19,7 @@ class TeslaDashcamApp {
         this.telemetryDecoder = null;
         this.settings = null;
         this.mapController = null;
+        this.timelineController = null;
         this.currentFile = null;
         this.telemetryData = null;
 
@@ -105,6 +107,11 @@ class TeslaDashcamApp {
                         telemetry.gps.longitude,
                         telemetry.gps.heading
                     );
+                }
+
+                // Update timeline progress
+                if (this.timelineController) {
+                    this.timelineController.updateVideoTime(data.currentTime);
                 }
             }
         });
@@ -228,6 +235,24 @@ class TeslaDashcamApp {
 
                     // Initialize map with GPS data
                     this.initializeMap();
+
+                    // Initialize timeline
+                    const timelineContainer = document.getElementById('customTimeline');
+                    if (timelineContainer) {
+                        this.timelineController = new TimelineController();
+                        const initialized = this.timelineController.initialize(
+                            this.videoPlayer,
+                            this.telemetryDecoder,
+                            timelineContainer
+                        );
+
+                        if (!initialized) {
+                            console.error('Failed to initialize timeline');
+                        } else {
+                            // Apply saved visibility preference
+                            this.settings.applyTimelineVisibility();
+                        }
+                    }
 
                     // Log statistics
                     const stats = this.telemetryDecoder.getStatistics();
@@ -523,6 +548,12 @@ class TeslaDashcamApp {
         if (this.mapController) {
             this.mapController.destroy();
             this.mapController = null;
+        }
+
+        // Clean up timeline
+        if (this.timelineController) {
+            this.timelineController.destroy();
+            this.timelineController = null;
         }
 
         this.elements.videoSection.classList.add('hidden');
