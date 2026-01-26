@@ -42,6 +42,7 @@
         <!-- Video Player Section -->
         <section id="videoSection" class="video-section hidden">
             <div class="video-wrapper">
+                <!-- Video Container -->
                 <div class="video-container">
                     <video id="videoPlayer"
                            preload="metadata"
@@ -49,81 +50,84 @@
                            controls
                            aria-label="Tesla dashcam video player">
                     </video>
+                </div>
 
-                    <!-- Telemetry Overlay -->
-                    <div id="telemetryOverlay" class="telemetry-overlay hidden">
-                    <div class="overlay-header">
-                        <span id="overlayTimestamp" class="timestamp">00:00</span>
-                        <button id="toggleOverlayBtn" class="toggle-btn" aria-label="Toggle telemetry overlay">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                <path d="M8 4.5a.5.5 0 01.5.5v3a.5.5 0 01-1 0V5a.5.5 0 01.5-.5zM8 11a.5.5 0 100-1 .5.5 0 000 1z"/>
-                            </svg>
-                        </button>
+                <!-- Right Panel: Telemetry Dashboard + Map -->
+                <div class="right-panel">
+                    <!-- Telemetry Dashboard -->
+                    <div id="telemetryDashboard" class="telemetry-dashboard hidden">
+                        <div class="dashboard-header">
+                            <span id="overlayTimestamp" class="timestamp">00:00</span>
+                            <button id="toggleOverlayBtn" class="toggle-btn" aria-label="Toggle telemetry dashboard">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M8 4.5a.5.5 0 01.5.5v3a.5.5 0 01-1 0V5a.5.5 0 01.5-.5zM8 11a.5.5 0 100-1 .5.5 0 000 1z"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="dashboard-grid">
+                            <!-- Speed Display (Large, Prominent) -->
+                            <div class="speed-display">
+                                <div id="speedValue" class="speed-value">--</div>
+                                <div id="speedUnit" class="speed-unit">mph</div>
+                            </div>
+
+                            <!-- Gear Indicator -->
+                            <div class="gear-indicator">
+                                <span class="label">Gear</span>
+                                <span id="gearValue" class="value badge">P</span>
+                            </div>
+
+                            <!-- Turn Signals -->
+                            <div class="turn-signals">
+                                <span id="leftSignal" class="signal signal-left" aria-label="Left turn signal">◄</span>
+                                <span id="rightSignal" class="signal signal-right" aria-label="Right turn signal">►</span>
+                            </div>
+
+                            <!-- Autopilot Status -->
+                            <div class="autopilot-status">
+                                <span class="label">Autopilot</span>
+                                <span id="autopilotValue" class="value badge">OFF</span>
+                            </div>
+
+                            <!-- Steering Wheel Angle -->
+                            <div class="steering-display">
+                                <span class="label">Steering</span>
+                                <span id="steeringValue" class="value">0°</span>
+                            </div>
+
+                            <!-- Pedal Indicators -->
+                            <div class="pedal-indicators">
+                                <div class="pedal-row">
+                                    <span class="label">Accelerator</span>
+                                    <div class="pedal-bar">
+                                        <div id="acceleratorBar" class="bar bar-accelerator" style="width: 0%"></div>
+                                    </div>
+                                    <span id="acceleratorValue" class="value">0%</span>
+                                </div>
+                                <div class="pedal-row">
+                                    <span class="label">Brake</span>
+                                    <div class="pedal-bar">
+                                        <div id="brakeBar" class="bar bar-brake" style="width: 0%"></div>
+                                    </div>
+                                    <span id="brakeValue" class="value">No</span>
+                                </div>
+                            </div>
+
+                            <!-- GPS Coordinates (Optional, Hidden by Default) -->
+                            <div class="gps-display" style="display: none;">
+                                <span class="label">GPS</span>
+                                <span id="gpsValue" class="value">--</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="overlay-grid">
-                        <!-- Speed Display (Large, Prominent) -->
-                        <div class="speed-display">
-                            <div id="speedValue" class="speed-value">--</div>
-                            <div id="speedUnit" class="speed-unit">mph</div>
-                        </div>
-
-                        <!-- Gear Indicator -->
-                        <div class="gear-indicator">
-                            <span class="label">Gear</span>
-                            <span id="gearValue" class="value badge">P</span>
-                        </div>
-
-                        <!-- Turn Signals -->
-                        <div class="turn-signals">
-                            <span id="leftSignal" class="signal signal-left" aria-label="Left turn signal">◄</span>
-                            <span id="rightSignal" class="signal signal-right" aria-label="Right turn signal">►</span>
-                        </div>
-
-                        <!-- Autopilot Status -->
-                        <div class="autopilot-status">
-                            <span class="label">Autopilot</span>
-                            <span id="autopilotValue" class="value badge">OFF</span>
-                        </div>
-
-                        <!-- Steering Wheel Angle -->
-                        <div class="steering-display">
-                            <span class="label">Steering</span>
-                            <span id="steeringValue" class="value">0°</span>
-                        </div>
-
-                        <!-- Pedal Indicators -->
-                        <div class="pedal-indicators">
-                            <div class="pedal-row">
-                                <span class="label">Accelerator</span>
-                                <div class="pedal-bar">
-                                    <div id="acceleratorBar" class="bar bar-accelerator" style="width: 0%"></div>
-                                </div>
-                                <span id="acceleratorValue" class="value">0%</span>
-                            </div>
-                            <div class="pedal-row">
-                                <span class="label">Brake</span>
-                                <div class="pedal-bar">
-                                    <div id="brakeBar" class="bar bar-brake" style="width: 0%"></div>
-                                </div>
-                                <span id="brakeValue" class="value">No</span>
-                            </div>
-                        </div>
-
-                        <!-- GPS Coordinates (Optional, Hidden by Default) -->
-                        <div class="gps-display" style="display: none;">
-                            <span class="label">GPS</span>
-                            <span id="gpsValue" class="value">--</span>
-                        </div>
+                    <!-- Map Container -->
+                    <div id="mapContainer" class="map-container">
+                        <!-- Leaflet map will mount here -->
                     </div>
                 </div>
             </div>
-
-            <!-- Map Container -->
-            <div id="mapContainer" class="map-container">
-                <!-- Leaflet map will mount here -->
-            </div>
-        </div>
 
             <!-- Custom Timeline with Event Markers -->
             <div id="customTimeline" class="custom-timeline hidden">

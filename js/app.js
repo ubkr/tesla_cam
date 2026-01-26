@@ -135,11 +135,11 @@ class TeslaDashcamApp {
             this.toggleSettings();
         });
 
-        // Toggle overlay button
+        // Toggle dashboard button
         const toggleOverlayBtn = document.getElementById('toggleOverlayBtn');
         if (toggleOverlayBtn) {
             toggleOverlayBtn.addEventListener('click', () => {
-                this.toggleTelemetryOverlayVisibility();
+                this.toggleTelemetryDashboardVisibility();
             });
         }
 
@@ -230,8 +230,8 @@ class TeslaDashcamApp {
                     statusEl.textContent = `Available (${indexSize} frames)`;
                     statusEl.style.color = 'var(--success-color)';
 
-                    // Show telemetry overlay
-                    this.showTelemetryOverlay();
+                    // Show telemetry dashboard
+                    this.showTelemetryDashboard();
 
                     // Initialize map with GPS data
                     this.initializeMap();
@@ -325,23 +325,23 @@ class TeslaDashcamApp {
     }
 
     /**
-     * Show telemetry overlay
+     * Show telemetry dashboard
      */
-    showTelemetryOverlay() {
-        const overlay = document.getElementById('telemetryOverlay');
-        if (overlay) {
-            overlay.classList.remove('hidden');
-            console.log('Telemetry overlay enabled');
+    showTelemetryDashboard() {
+        const dashboard = document.getElementById('telemetryDashboard');
+        if (dashboard) {
+            dashboard.classList.remove('hidden');
+            console.log('Telemetry dashboard enabled');
 
             // Apply saved visibility preference (whether to show/hide the data grid)
-            this.settings.applyOverlayVisibility();
+            this.settings.applyDashboardVisibility();
         }
     }
 
     /**
-     * Toggle telemetry overlay visibility (hide/show the data grid)
+     * Toggle telemetry dashboard visibility (hide/show the data grid)
      */
-    toggleTelemetryOverlayVisibility() {
+    toggleTelemetryDashboardVisibility() {
         // Get current visibility state
         const currentlyVisible = this.settings.get('overlayVisible');
 
