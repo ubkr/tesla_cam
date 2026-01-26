@@ -6,7 +6,7 @@ This document consolidates all planned future enhancements for the Tesla Dashcam
 
 ## Current Version
 
-**Version**: 1.2.0 (Timeline & Event Markers)
+**Version**: 1.3.0 (Dashboard Layout & UX Improvements)
 **Date**: January 26, 2026
 
 ### Completed Features ✅
@@ -33,45 +33,21 @@ This document consolidates all planned future enhancements for the Tesla Dashcam
 - Settings integration for timeline visibility
 - Mobile-responsive design with performance optimizations
 
+**Phase 4 - Dashboard Layout (v1.3.0):**
+- Repositioned telemetry from video overlay to dedicated dashboard panel
+- Dashboard positioned to the right of video, above GPS map
+- Unobstructed video viewing with no overlay blocking content
+- Improved screen real estate usage with grid/flexbox layout
+- Responsive layout: stacks vertically on mobile (video → dashboard → map → timeline)
+- Better dashboard visibility and professional layout
+
 ---
 
 ## Planned Enhancements
 
-### High Priority (Next Release - v1.3.0)
+### High Priority (Next Release - v1.4.0)
 
-#### 1. Reposition Telemetry Overlay
-**Status**: Planned
-**Complexity**: Low
-**Description**: Move telemetry dashboard from video overlay to dedicated panel
-- Remove telemetry overlay from covering the video
-- Position dashboard to the right, above the GPS map
-- Maintain responsive layout (stack vertically on mobile)
-- Keep same telemetry data and styling
-- Ensure dashboard remains synchronized with video playback
-
-**Layout Changes**:
-```
-Desktop:                      Mobile:
-┌──────────┬────────┐        ┌──────────┐
-│          │Teleme- │        │  Video   │
-│  Video   │  try   │        ├──────────┤
-│          │Dashboard│       │Dashboard │
-│          ├────────┤        ├──────────┤
-│          │  Map   │        │   Map    │
-├──────────┴────────┤        ├──────────┤
-│     Timeline      │        │ Timeline │
-└───────────────────┘        └──────────┘
-```
-
-**Benefits**:
-- Unobstructed video viewing
-- Better use of screen real estate
-- Clearer dashboard visibility
-- More professional layout
-
----
-
-#### 2. Multi-Camera Synchronization
+#### 1. Multi-Camera Synchronization
 **Status**: Planned
 **Complexity**: High
 **Description**: Simultaneously play all 4-6 camera angles from a single event
@@ -94,7 +70,7 @@ Desktop:                      Mobile:
 
 ---
 
-#### 3. Telemetry Data Export
+#### 2. Telemetry Data Export
 **Status**: Planned
 **Complexity**: Medium
 **Description**: Export telemetry data to standard formats
@@ -118,9 +94,9 @@ timestamp,speed_mph,gear,autopilot,latitude,longitude,heading
 
 ---
 
-### Medium Priority (v1.4.0 - v1.5.0)
+### Medium Priority (v1.5.0 - v1.6.0)
 
-#### 4. Enhanced Map Features
+#### 3. Enhanced Map Features
 **Status**: Partially implemented (basic map in v1.1.0)
 **Complexity**: Medium
 **Description**: Advanced map functionality
@@ -141,7 +117,7 @@ timestamp,speed_mph,gear,autopilot,latitude,longitude,heading
 
 ---
 
-#### 5. Keyboard Shortcuts
+#### 4. Keyboard Shortcuts
 **Status**: Planned
 **Complexity**: Low
 **Description**: Keyboard controls for faster interaction
@@ -163,7 +139,7 @@ timestamp,speed_mph,gear,autopilot,latitude,longitude,heading
 
 ---
 
-#### 6. Dark Mode Theme
+#### 5. Dark Mode Theme
 **Status**: Planned
 **Complexity**: Low
 **Description**: Dark theme for comfortable viewing
@@ -181,7 +157,7 @@ timestamp,speed_mph,gear,autopilot,latitude,longitude,heading
 
 ---
 
-#### 7. Event Detection
+#### 6. Event Detection
 **Status**: Planned
 **Complexity**: Medium
 **Description**: Automatic detection of driving events
@@ -203,7 +179,7 @@ timestamp,speed_mph,gear,autopilot,latitude,longitude,heading
 
 ### Low Priority (Future Versions)
 
-#### 8. Custom Overlay Layouts
+#### 7. Custom Overlay Layouts
 **Status**: Planned
 **Complexity**: Medium
 **Description**: User-customizable telemetry overlay
@@ -215,7 +191,7 @@ timestamp,speed_mph,gear,autopilot,latitude,longitude,heading
 
 ---
 
-#### 9. Video Clip Creation
+#### 8. Video Clip Creation
 **Status**: Planned
 **Complexity**: High
 **Description**: Create and export video clips
@@ -233,7 +209,7 @@ timestamp,speed_mph,gear,autopilot,latitude,longitude,heading
 
 ---
 
-#### 10. Performance Improvements
+#### 9. Performance Improvements
 **Status**: Ongoing
 **Complexity**: Variable
 **Description**: Optimize for better performance
@@ -246,7 +222,7 @@ timestamp,speed_mph,gear,autopilot,latitude,longitude,heading
 
 ---
 
-#### 11. Advanced Statistics
+#### 10. Advanced Statistics
 **Status**: Planned
 **Complexity**: Medium
 **Description**: Comprehensive drive analytics
@@ -267,7 +243,7 @@ timestamp,speed_mph,gear,autopilot,latitude,longitude,heading
 
 ---
 
-#### 12. Share & Collaboration
+#### 11. Share & Collaboration
 **Status**: Planned
 **Complexity**: High
 **Description**: Share clips and collaborate
@@ -284,7 +260,7 @@ timestamp,speed_mph,gear,autopilot,latitude,longitude,heading
 
 ---
 
-#### 13. Browser Extension
+#### 12. Browser Extension
 **Status**: Idea phase
 **Complexity**: High
 **Description**: Chrome/Firefox extension for quick access
@@ -351,20 +327,23 @@ Track feature requests from users:
 - Video timeline with event markers
 - 6 event types with interactive features
 
-**v1.3.0** (Q1 2026):
-- Reposition telemetry overlay
+**v1.3.0** (Q1 2026): ✅ COMPLETED
+- Repositioned telemetry dashboard to dedicated panel
+- Improved layout and screen space utilization
+
+**v1.4.0** (Q2 2026): PLANNED
 - Multi-camera synchronization
 - Telemetry data export (CSV/JSON)
 
-**v1.4.0** (Q2 2026):
+**v1.5.0** (Q2 2026): PLANNED
 - Enhanced map features
 - Keyboard shortcuts
 
-**v1.5.0** (Q3 2026):
+**v1.6.0** (Q3 2026): PLANNED
 - Dark mode theme
 - Custom overlay layouts
 
-**v2.0.0** (Q4 2026):
+**v2.0.0** (Q4 2026): PLANNED
 - Major UI redesign
 - Advanced statistics dashboard
 - Performance overhaul
@@ -391,7 +370,7 @@ Have ideas for new features? Please:
 
 ---
 
-**Document Version**: 1.1
+**Document Version**: 1.2
 **Last Updated**: January 26, 2026
 **Maintained By**: Project contributors
 
@@ -399,6 +378,7 @@ Have ideas for new features? Please:
 
 ## Version History
 
+- **v1.3.0** (Jan 2026): Repositioned telemetry dashboard to dedicated panel ✅
 - **v1.2.0** (Jan 2026): Video timeline with event markers ✅
 - **v1.1.0** (Jan 2026): GPS map integration ✅
 - **v1.0.0** (Jan 2026): MVP release with single camera playback and telemetry overlay ✅
