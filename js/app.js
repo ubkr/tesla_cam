@@ -436,6 +436,128 @@ class TeslaDashcamApp {
         if (gpsValue) {
             gpsValue.textContent = TelemetryDecoder.formatGPS(telemetry.gps);
         }
+
+        // Update acceleration vector indicator
+        this.updateAccelerationIndicator(telemetry.acceleration);
+    }
+
+    /**
+     * Update acceleration vector visualization
+     */
+    updateAccelerationIndicator(acceleration) {
+        const canvas = document.getElementById('accelCanvas');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const maxRadius = centerX - 10; // Leave margin for border
+
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw center crosshairs
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(centerX - 5, centerY);
+        ctx.lineTo(centerX + 5, centerY);
+        ctx.moveTo(centerX, centerY - 5);
+        ctx.lineTo(centerX, centerY + 5);
+        ctx.stroke();
+
+        // Draw reference circles (for scale)
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.lineWidth = 0.5;
+        [0.33, 0.66].forEach(scale => {
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, maxRadius * scale, 0, Math.PI * 2);
+            ctx.stroke();
+        });
+
+        // Get acceleration values
+        // X = forward/backward (positive = forward acceleration, negative = braking)
+        // Y = left/right (positive = right, negative = left)
+        const accelX = acceleration.x || 0;
+        const accelY = acceleration.y || 0;
+
+        // Scale factor: Tesla Model Y can exceed 1g during hard braking and Performance acceleration
+        // Use 1.5g (15 m/s²) as full scale to prevent clipping during hard maneuvers
+        const scaleFactor = maxRadius / 15; // 15 m/s² (~1.5g) = full radius
+
+        // Calculate vector endpoint
+        // Note: Canvas Y-axis is inverted (down is positive), so negate accelX
+        const vectorX = centerX + (accelY * scaleFactor);
+        const vectorY = centerY - (accelX * scaleFactor); // Negate for correct direction
+
+        // Clamp to circle boundary
+        const dx = vectorX - centerX;
+        const dy = vectorY - centerY;
+        const magnitude = Math.sqrt(dx * dx + dy * dy);
+        let endX = vectorX;
+        let endY = vectorY;
+
+        if (magnitude > maxRadius) {
+            const angle = Math.atan2(dy, dx);
+            endX = centerX + Math.cos(angle) * maxRadius;
+            endY = centerY + Math.sin(angle) * maxRadius;
+        }
+
+        // Draw acceleration vector
+        const accelMagnitude = Math.sqrt(accelX * accelX + accelY * accelY);
+
+        // Color based on magnitude (green -> yellow -> red)
+        let vectorColor;
+        if (accelMagnitude < 2) {
+            vectorColor = '#00ff00'; // Green (light acceleration)
+        } else if (accelMagnitude < 5) {
+            vectorColor = '#ffff00'; // Yellow (moderate)
+        } else {
+            vectorColor = '#ff0000'; // Red (strong)
+        }
+
+        // Draw the vector line
+        ctx.strokeStyle = vectorColor;
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+
+        // Draw arrowhead
+        if (magnitude > 5) {
+            const angle = Math.atan2(endY - centerY, endX - centerX);
+            const arrowLength = 8;
+            const arrowAngle = Math.PI / 6;
+
+            ctx.fillStyle = vectorColor;
+            ctx.beginPath();
+            ctx.moveTo(endX, endY);
+            ctx.lineTo(
+                endX - arrowLength * Math.cos(angle - arrowAngle),
+                endY - arrowLength * Math.sin(angle - arrowAngle)
+            );
+            ctx.lineTo(
+                endX - arrowLength * Math.cos(angle + arrowAngle),
+                endY - arrowLength * Math.sin(angle + arrowAngle)
+            );
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // Draw center dot
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Update G-force text value (1g = 9.8 m/s²)
+        const gForce = accelMagnitude / 9.8;
+        const accelValueEl = document.getElementById('accelValue');
+        if (accelValueEl) {
+            accelValueEl.textContent = `${gForce.toFixed(2)}g`;
+        }
     }
 
     /**
