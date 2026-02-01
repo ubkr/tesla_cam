@@ -119,6 +119,15 @@ export class TelemetryDecoder {
         // Get frame sequence number
         const frameSeqNo = seiData.frameSeqNo || index;
 
+        // Detect regenerative braking (engine braking)
+        // Occurs when: decelerating, accelerator lifted, brake not applied, vehicle moving
+        const isRegenerativeBraking = (
+            accelX < -0.5 &&              // Decelerating (negative acceleration)
+            accelerator < 5 &&             // Accelerator pedal lifted (< 5%)
+            !brakeApplied &&               // Physical brake not pressed
+            speedMps > 0.5                 // Vehicle is moving (> 0.5 m/s)
+        );
+
         return {
             // Speed (multiple units for convenience)
             speed: {
@@ -133,6 +142,7 @@ export class TelemetryDecoder {
             // Pedals
             accelerator,
             brake: brakeApplied,
+            regenBraking: isRegenerativeBraking,
 
             // Turn signals
             turnSignals: {

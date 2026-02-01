@@ -422,6 +422,15 @@ class TeslaDashcamApp {
             brakeValue.textContent = telemetry.brake ? 'Yes' : 'No';
         }
 
+        // Update regenerative braking
+        const regenBar = document.getElementById('regenBar');
+        const regenValue = document.getElementById('regenValue');
+        if (regenBar && regenValue) {
+            const regenPercent = telemetry.regenBraking ? 100 : 0;
+            regenBar.style.width = `${regenPercent}%`;
+            regenValue.textContent = telemetry.regenBraking ? 'Yes' : 'No';
+        }
+
         // Update GPS (if visible)
         const gpsValue = document.getElementById('gpsValue');
         if (gpsValue) {

@@ -358,6 +358,10 @@ video {
     background-color: var(--danger-color);
 }
 
+.bar-regen {
+    background-color: #00bcd4; /* Cyan for regenerative braking */
+}
+
 .pedal-row .value {
     min-width: 40px;
     font-size: 0.9rem;
