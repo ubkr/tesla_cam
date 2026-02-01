@@ -478,14 +478,22 @@ class TeslaDashcamApp {
         // Get acceleration values
         // X = forward/backward (positive = forward acceleration, negative = braking)
         // Y = left/right (positive = right, negative = left)
+        // Z = vertical (positive = up, negative = down)
         const accelX = acceleration.x || 0;
         const accelY = acceleration.y || 0;
+        const accelZ = acceleration.z || 0;
+
+        // Calculate total 3D acceleration magnitude (for G-force display)
+        const accelMagnitude = Math.sqrt(accelX * accelX + accelY * accelY + accelZ * accelZ);
+
+        // Calculate horizontal plane magnitude (for visual arrow direction/length)
+        const accelHorizontal = Math.sqrt(accelX * accelX + accelY * accelY);
 
         // Scale factor: Tesla Model Y can exceed 1g during hard braking and Performance acceleration
         // Use 1.5g (15 m/s²) as full scale to prevent clipping during hard maneuvers
         const scaleFactor = maxRadius / 15; // 15 m/s² (~1.5g) = full radius
 
-        // Calculate vector endpoint
+        // Calculate vector endpoint (using horizontal components only for 2D display)
         // Note: Canvas Y-axis is inverted (down is positive), so negate accelX
         const vectorX = centerX + (accelY * scaleFactor);
         const vectorY = centerY - (accelX * scaleFactor); // Negate for correct direction
@@ -503,17 +511,15 @@ class TeslaDashcamApp {
             endY = centerY + Math.sin(angle) * maxRadius;
         }
 
-        // Draw acceleration vector
-        const accelMagnitude = Math.sqrt(accelX * accelX + accelY * accelY);
-
-        // Color based on magnitude (green -> yellow -> red)
+        // Color based on total 3D magnitude (green -> yellow -> red)
+        // Using total magnitude ensures color represents true G-force intensity
         let vectorColor;
         if (accelMagnitude < 2) {
-            vectorColor = '#00ff00'; // Green (light acceleration)
+            vectorColor = '#00ff00'; // Green (light: < 0.2g)
         } else if (accelMagnitude < 5) {
-            vectorColor = '#ffff00'; // Yellow (moderate)
+            vectorColor = '#ffff00'; // Yellow (moderate: 0.2-0.5g)
         } else {
-            vectorColor = '#ff0000'; // Red (strong)
+            vectorColor = '#ff0000'; // Red (strong: > 0.5g)
         }
 
         // Draw the vector line
@@ -525,8 +531,8 @@ class TeslaDashcamApp {
         ctx.lineTo(endX, endY);
         ctx.stroke();
 
-        // Draw arrowhead
-        if (magnitude > 5) {
+        // Draw arrowhead (only for significant horizontal forces)
+        if (accelHorizontal > 3) { // Show arrow when horizontal acceleration > 3 m/s² (~0.3g)
             const angle = Math.atan2(endY - centerY, endX - centerX);
             const arrowLength = 8;
             const arrowAngle = Math.PI / 6;
