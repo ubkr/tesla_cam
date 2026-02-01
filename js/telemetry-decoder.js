@@ -85,8 +85,11 @@ export class TelemetryDecoder {
         // Get steering angle
         const steeringAngle = seiData.steeringWheelAngle || 0;
 
-        // Get pedal positions (0-1 scale to percentage)
-        const accelerator = (seiData.acceleratorPedalPosition || 0) * 100;
+        // Get pedal positions (raw value - scale varies, clamp to 0-100 for display)
+        const acceleratorRaw = seiData.acceleratorPedalPosition || 0;
+        // Tesla documentation says 0-1, but real data shows 0-100 scale
+        // Clamp to prevent display issues
+        const accelerator = Math.min(Math.max(acceleratorRaw, 0), 100);
 
         // Get brake status
         const brakeApplied = seiData.brakeApplied || false;

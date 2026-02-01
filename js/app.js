@@ -407,7 +407,9 @@ class TeslaDashcamApp {
         const acceleratorValue = document.getElementById('acceleratorValue');
         if (acceleratorBar && acceleratorValue) {
             const accelPercent = Math.round(telemetry.accelerator);
-            acceleratorBar.style.width = `${accelPercent}%`;
+            // Clamp bar width to 0-100% for visual display
+            const barWidth = Math.min(Math.max(accelPercent, 0), 100);
+            acceleratorBar.style.width = `${barWidth}%`;
             acceleratorValue.textContent = `${accelPercent}%`;
         }
 
