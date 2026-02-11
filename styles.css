@@ -21,6 +21,7 @@
     --overlay-bg: rgba(0, 0, 0, 0.75);
     --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.2);
+    --regen-color: #00bcd4;
     --transition: all 0.3s ease;
 }
 
@@ -372,7 +373,7 @@ video {
 }
 
 .bar-regen {
-    background-color: #00bcd4; /* Cyan for regenerative braking */
+    background-color: var(--regen-color);
 }
 
 .pedal-row .value {

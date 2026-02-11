@@ -13,9 +13,6 @@ export class VideoPlayer {
         this.callbacks = {
             onLoadedMetadata: null,
             onTimeUpdate: null,
-            onPlay: null,
-            onPause: null,
-            onEnded: null,
             onError: null
         };
 
@@ -33,12 +30,6 @@ export class VideoPlayer {
         // Metadata loaded (duration, dimensions available)
         this.videoElement.addEventListener('loadedmetadata', () => {
             this.duration = this.videoElement.duration;
-            console.log('Video metadata loaded:', {
-                duration: this.duration,
-                width: this.videoElement.videoWidth,
-                height: this.videoElement.videoHeight
-            });
-
             if (this.callbacks.onLoadedMetadata) {
                 this.callbacks.onLoadedMetadata({
                     duration: this.duration,
@@ -102,15 +93,6 @@ export class VideoPlayer {
             }
         });
 
-        // Can play (enough data loaded to start playback)
-        this.videoElement.addEventListener('canplay', () => {
-            console.log('Video can start playing');
-        });
-
-        // Waiting (buffering)
-        this.videoElement.addEventListener('waiting', () => {
-            console.log('Video buffering...');
-        });
     }
 
     /**
@@ -208,6 +190,7 @@ export class VideoPlayer {
      * Seek to specific time
      */
     seek(time) {
+        if (!isFinite(time)) return;
         if (time >= 0 && time <= this.duration) {
             this.videoElement.currentTime = time;
         }
@@ -263,27 +246,6 @@ export class VideoPlayer {
      */
     onTimeUpdate(callback) {
         this.callbacks.onTimeUpdate = callback;
-    }
-
-    /**
-     * Register callback for play event
-     */
-    onPlay(callback) {
-        this.callbacks.onPlay = callback;
-    }
-
-    /**
-     * Register callback for pause event
-     */
-    onPause(callback) {
-        this.callbacks.onPause = callback;
-    }
-
-    /**
-     * Register callback for ended event
-     */
-    onEnded(callback) {
-        this.callbacks.onEnded = callback;
     }
 
     /**

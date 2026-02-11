@@ -74,6 +74,9 @@ export class TimelineController {
         // Throttle hover events
         this.lastHoverUpdate = 0;
         this.hoverThrottle = 16; // ~60fps
+
+        // Bound handler for proper cleanup
+        this._handleResizeBound = this.handleResize.bind(this);
     }
 
     /**
@@ -120,13 +123,7 @@ export class TimelineController {
         this.render();
 
         // Handle window resize
-        window.addEventListener('resize', () => this.handleResize());
-
-        console.log('Timeline initialized:', {
-            duration: this.duration,
-            speedDataPoints: this.speedData.length,
-            events: this.events.length
-        });
+        window.addEventListener('resize', this._handleResizeBound);
 
         return true;
     }
@@ -173,7 +170,6 @@ export class TimelineController {
             });
         }
 
-        console.log(`Timeline: Extracted ${this.speedData.length} speed data points`);
     }
 
     /**
@@ -192,13 +188,13 @@ export class TimelineController {
         for (let i = 0; i < allTelemetry.length; i++) {
             const data = allTelemetry[i];
 
-            // Hard braking: acceleration.y < -4.0
-            if (data.acceleration.y < this.EVENT_TYPES.hardBraking.threshold &&
+            // Hard braking: acceleration.x < -4.0 (longitudinal deceleration)
+            if (data.acceleration.x < this.EVENT_TYPES.hardBraking.threshold &&
                 data.speed.mph > this.EVENT_TYPES.hardBraking.minSpeed) {
                 events.push({
                     type: 'hardBraking',
                     timestamp: data.timestamp,
-                    severity: Math.abs(data.acceleration.y) / 10 // 0-1 scale
+                    severity: Math.abs(data.acceleration.x) / 10 // 0-1 scale
                 });
             }
 
@@ -236,13 +232,13 @@ export class TimelineController {
             }
             lastAutopilotState = data.autopilot.state;
 
-            // Rapid acceleration: acceleration.y > 3.0
-            if (data.acceleration.y > this.EVENT_TYPES.rapidAcceleration.threshold &&
+            // Rapid acceleration: acceleration.x > 3.0 (longitudinal acceleration)
+            if (data.acceleration.x > this.EVENT_TYPES.rapidAcceleration.threshold &&
                 data.speed.mph > this.EVENT_TYPES.rapidAcceleration.minSpeed) {
                 events.push({
                     type: 'rapidAcceleration',
                     timestamp: data.timestamp,
-                    severity: data.acceleration.y / 10 // 0-1 scale
+                    severity: data.acceleration.x / 10 // 0-1 scale
                 });
             }
 
@@ -262,7 +258,6 @@ export class TimelineController {
         // Deduplicate nearby events (within 0.5s)
         this.events = this.deduplicateEvents(events);
 
-        console.log(`Timeline: Detected ${this.events.length} events`);
     }
 
     /**
@@ -499,11 +494,7 @@ export class TimelineController {
             const normalizedSpeed = data.speed / maxSpeed;
             const y = this.height - (normalizedSpeed * (this.height - 20));
 
-            if (i === 0) {
-                this.ctx.lineTo(x, y);
-            } else {
-                this.ctx.lineTo(x, y);
-            }
+            this.ctx.lineTo(x, y);
         }
 
         this.ctx.lineTo(this.width, this.height);
@@ -661,7 +652,7 @@ export class TimelineController {
         }
 
         // Remove event listeners
-        window.removeEventListener('resize', () => this.handleResize());
+        window.removeEventListener('resize', this._handleResizeBound);
 
         this.speedData = [];
         this.events = [];

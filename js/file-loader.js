@@ -5,6 +5,7 @@
 
 const TESLA_FILENAME_PATTERN = /^(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})-(front|rear|left_repeater|right_repeater|left_pillar|right_pillar)\.mp4$/i;
 const MAX_SAFE_FILE_SIZE = 2 * 1024 * 1024 * 1024; // 2GB
+const MAX_FILE_SIZE = 5 * 1024 * 1024 * 1024; // 5GB
 
 export class FileLoader {
     constructor() {
@@ -148,7 +149,7 @@ export class FileLoader {
         }
 
         // Check if file size is too large (warning, not error)
-        if (file.size > 5 * 1024 * 1024 * 1024) { // 5GB
+        if (file.size > MAX_FILE_SIZE) {
             return {
                 valid: false,
                 error: 'File is too large (>5GB). Please select a smaller file.'

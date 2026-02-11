@@ -4,6 +4,12 @@
  */
 
 export class MapController {
+    static isValidCoordinate(lat, lon) {
+        return isFinite(lat) && isFinite(lon) &&
+            lat >= -90 && lat <= 90 &&
+            lon >= -180 && lon <= 180;
+    }
+
     constructor(containerId) {
         this.containerId = containerId;
         this.map = null;
@@ -16,8 +22,6 @@ export class MapController {
      * Initialize Leaflet map with OpenStreetMap tiles
      */
     initialize(centerLat, centerLon, zoom = 13) {
-        console.log('Initializing map at', { centerLat, centerLon, zoom });
-
         // Check if Leaflet is loaded
         if (typeof L === 'undefined') {
             console.error('Leaflet library not loaded');
@@ -39,7 +43,6 @@ export class MapController {
                 title: 'Current Position'
             }).addTo(this.map);
 
-            console.log('Map initialized successfully');
             return true;
         } catch (error) {
             console.error('Failed to initialize map:', error);
@@ -56,14 +59,13 @@ export class MapController {
             return;
         }
 
-        console.log('Building route from telemetry...', { count: telemetryArray.length });
 
         // Extract valid GPS coordinates
         this.routeCoordinates = telemetryArray
-            .filter(t => t.gps && t.gps.isValid)
+            .filter(t => t.gps && t.gps.isValid &&
+                MapController.isValidCoordinate(t.gps.latitude, t.gps.longitude))
             .map(t => [t.gps.latitude, t.gps.longitude]);
 
-        console.log('Valid GPS coordinates found:', this.routeCoordinates.length);
 
         if (this.routeCoordinates.length === 0) {
             console.warn('No valid GPS coordinates found');
@@ -80,7 +82,6 @@ export class MapController {
         // Fit map bounds to show entire route
         this.map.fitBounds(this.routePath.getBounds(), { padding: [50, 50] });
 
-        console.log('Route path created and added to map');
     }
 
     /**
@@ -91,6 +92,8 @@ export class MapController {
             console.warn('Position marker not initialized');
             return;
         }
+
+        if (!MapController.isValidCoordinate(latitude, longitude)) return;
 
         // Update marker position
         this.currentPositionMarker.setLatLng([latitude, longitude]);
@@ -132,6 +135,5 @@ export class MapController {
         this.currentPositionMarker = null;
         this.routePath = null;
         this.routeCoordinates = [];
-        console.log('Map controller destroyed');
     }
 }

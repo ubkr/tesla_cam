@@ -5,8 +5,9 @@
  */
 
 // Import dependencies (workers have their own scope)
-// Use absolute paths from root for reliability
-importScripts('/lib/protobuf.min.js', '/lib/dashcam-mp4.js');
+// Derive base path from worker location for subdirectory deployment support
+const _basePath = self.location.href.replace(/\/js\/mp4-worker\.js.*$/, '/');
+importScripts(_basePath + 'lib/protobuf.min.js', _basePath + 'lib/dashcam-mp4.js');
 
 let SeiMetadata = null;
 
@@ -73,7 +74,7 @@ self.onmessage = async function(e) {
         try {
             // Initialize protobuf
             postMessage({ type: 'progress', data: { percentage: 10, message: 'Initializing decoder...' } });
-            await initializeProtobuf(protoPath || '/lib/dashcam.proto');
+            await initializeProtobuf(protoPath || (_basePath + 'lib/dashcam.proto'));
 
             // Parse MP4
             const result = parseMP4(buffer);

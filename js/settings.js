@@ -10,6 +10,8 @@ const DEFAULT_SETTINGS = {
     timelineVisible: true
 };
 
+const ALLOWED_SETTINGS_KEYS = new Set(Object.keys(DEFAULT_SETTINGS));
+
 export class Settings {
     constructor() {
         this.settings = { ...DEFAULT_SETTINGS };
@@ -34,7 +36,6 @@ export class Settings {
         // Apply initial settings to UI
         this.applySettingsToUI();
 
-        console.log('Settings initialized:', this.settings);
     }
 
     /**
@@ -45,7 +46,13 @@ export class Settings {
             const stored = localStorage.getItem('teslaDashcamSettings');
             if (stored) {
                 const parsed = JSON.parse(stored);
-                this.settings = { ...DEFAULT_SETTINGS, ...parsed };
+                const filtered = {};
+                for (const key of ALLOWED_SETTINGS_KEYS) {
+                    if (key in parsed) {
+                        filtered[key] = parsed[key];
+                    }
+                }
+                this.settings = { ...DEFAULT_SETTINGS, ...filtered };
             }
         } catch (error) {
             console.error('Failed to load settings:', error);
@@ -59,7 +66,6 @@ export class Settings {
     saveSettings() {
         try {
             localStorage.setItem('teslaDashcamSettings', JSON.stringify(this.settings));
-            console.log('Settings saved:', this.settings);
         } catch (error) {
             console.error('Failed to save settings:', error);
         }
@@ -160,7 +166,6 @@ export class Settings {
             this.callbacks.onSpeedUnitChange(unit);
         }
 
-        console.log('Speed unit changed to:', unit);
     }
 
     /**
@@ -183,7 +188,6 @@ export class Settings {
             this.callbacks.onOverlayVisibilityChange(visible);
         }
 
-        console.log('Dashboard visibility changed to:', visible);
     }
 
     /**
@@ -205,7 +209,6 @@ export class Settings {
             this.callbacks.onOverlayStyleChange(style);
         }
 
-        console.log('Overlay style changed to:', style);
     }
 
     /**
@@ -284,7 +287,6 @@ export class Settings {
             this.callbacks.onTimelineVisibilityChange(visible);
         }
 
-        console.log('Timeline visibility changed to:', visible);
     }
 
     /**
@@ -350,6 +352,5 @@ export class Settings {
         this.settings = { ...DEFAULT_SETTINGS };
         this.saveSettings();
         this.applySettingsToUI();
-        console.log('Settings reset to defaults');
     }
 }

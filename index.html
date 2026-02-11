@@ -99,7 +99,7 @@
                             <!-- Acceleration Vector Indicator -->
                             <div class="accel-indicator">
                                 <span class="label">G-Force</span>
-                                <canvas id="accelCanvas" class="accel-canvas" width="80" height="80"></canvas>
+                                <canvas id="accelCanvas" class="accel-canvas" width="80" height="80" role="img" aria-label="Acceleration vector indicator"></canvas>
                                 <span id="accelValue" class="value accel-value">0.0g</span>
                             </div>
 
@@ -129,7 +129,7 @@
                             </div>
 
                             <!-- GPS Coordinates (Optional, Hidden by Default) -->
-                            <div class="gps-display" style="display: none;">
+                            <div class="gps-display hidden">
                                 <span class="label">GPS</span>
                                 <span id="gpsValue" class="value">--</span>
                             </div>
@@ -145,7 +145,7 @@
 
             <!-- Custom Timeline with Event Markers -->
             <div id="customTimeline" class="custom-timeline hidden">
-                <canvas id="timelineCanvas" class="timeline-canvas"></canvas>
+                <canvas id="timelineCanvas" class="timeline-canvas" role="img" aria-label="Video timeline with speed graph and event markers" tabindex="0"></canvas>
                 <div id="timelineTooltip" class="timeline-tooltip hidden"></div>
             </div>
 

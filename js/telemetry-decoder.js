@@ -23,9 +23,16 @@ const GEAR_STATES = {
     3: 'N'
 };
 
+/**
+ * Tesla uses SAE-convention axes for linear acceleration:
+ *   X = longitudinal (positive = forward acceleration, negative = braking)
+ *   Y = lateral (positive = right, negative = left)
+ *   Z = vertical (positive = up, negative = down)
+ */
 export class TelemetryDecoder {
     constructor() {
         this.telemetryIndex = new Map();
+        this.sortedTimestamps = [];
         this.frameRate = 30; // Default frame rate
         this.duration = 0;
     }
@@ -34,14 +41,9 @@ export class TelemetryDecoder {
      * Build telemetry index from SEI messages and video config
      */
     buildIndex(seiMessages, videoConfig, duration) {
-        console.log('Building telemetry index...', {
-            messageCount: seiMessages.length,
-            videoConfig,
-            duration
-        });
-
         this.duration = duration;
         this.telemetryIndex.clear();
+        this.sortedTimestamps = [];
 
         // Calculate frame rate from video config
         if (videoConfig && videoConfig.durations && videoConfig.durations.length > 0) {
@@ -66,7 +68,8 @@ export class TelemetryDecoder {
             this.telemetryIndex.set(timestamp, telemetry);
         }
 
-        console.log(`Telemetry index built: ${this.telemetryIndex.size} entries`);
+        this.sortedTimestamps = Array.from(this.telemetryIndex.keys()).sort((a, b) => a - b);
+
         return this.telemetryIndex.size;
     }
 
@@ -187,31 +190,40 @@ export class TelemetryDecoder {
     }
 
     /**
-     * Get telemetry data for a specific video time
+     * Get telemetry data for a specific video time using binary search (O(log n))
      */
     getTelemetryAtTime(time) {
-        // Find closest timestamp
-        let closestTime = null;
-        let minDiff = Infinity;
-
-        for (const timestamp of this.telemetryIndex.keys()) {
-            const diff = Math.abs(timestamp - time);
-            if (diff < minDiff) {
-                minDiff = diff;
-                closestTime = timestamp;
-            }
-
-            // Optimization: if we find exact match or very close, stop
-            if (diff < 0.016) { // ~1 frame at 60fps
-                break;
-            }
-        }
-
+        const closestTime = this._binarySearchClosest(time);
         if (closestTime !== null) {
             return this.telemetryIndex.get(closestTime);
         }
-
         return null;
+    }
+
+    /**
+     * Binary search for the closest timestamp to the given time
+     */
+    _binarySearchClosest(time) {
+        const timestamps = this.sortedTimestamps;
+        if (timestamps.length === 0) return null;
+
+        let lo = 0;
+        let hi = timestamps.length - 1;
+
+        while (lo < hi) {
+            const mid = (lo + hi) >> 1;
+            if (timestamps[mid] < time) {
+                lo = mid + 1;
+            } else {
+                hi = mid;
+            }
+        }
+
+        // lo is the first index >= time; check lo and lo-1 for closest
+        if (lo === 0) return timestamps[0];
+        const diffLo = Math.abs(timestamps[lo] - time);
+        const diffPrev = Math.abs(timestamps[lo - 1] - time);
+        return diffLo <= diffPrev ? timestamps[lo] : timestamps[lo - 1];
     }
 
     /**

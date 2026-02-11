@@ -22,6 +22,7 @@ class TeslaDashcamApp {
         this.timelineController = null;
         this.currentFile = null;
         this.telemetryData = null;
+        this._parseGeneration = 0;
 
         // UI Elements
         this.elements = {
@@ -45,8 +46,6 @@ class TeslaDashcamApp {
      * Initialize the application
      */
     async initialize() {
-        console.log('Initializing Tesla Dashcam Viewer...');
-
         try {
             // Initialize file loader
             this.fileLoader = new FileLoader();
@@ -70,7 +69,6 @@ class TeslaDashcamApp {
             // Setup UI event listeners
             this.setupUIEventListeners();
 
-            console.log('Application initialized successfully');
         } catch (error) {
             console.error('Initialization error:', error);
             this.showError('Initialization Error', error.message);
@@ -82,7 +80,6 @@ class TeslaDashcamApp {
      */
     setupVideoPlayerCallbacks() {
         this.videoPlayer.onLoadedMetadata((data) => {
-            console.log('Video loaded:', data);
             this.updateVideoMetadata(data);
         });
 
@@ -160,13 +157,16 @@ class TeslaDashcamApp {
      * Handle file selection
      */
     async handleFileSelected(fileData) {
+        // Cancel any in-progress parse
+        this._parseGeneration++;
+        this.mp4Parser.cancel();
+
         // Check for errors
         if (fileData.error) {
             this.showError('File Error', fileData.error);
             return;
         }
 
-        console.log('File selected:', fileData);
         this.currentFile = fileData;
 
         // Display file info
@@ -187,6 +187,7 @@ class TeslaDashcamApp {
 
         } catch (error) {
             this.hideLoading();
+            this.hideProgressBar();
             this.showError('Video Loading Error', error.message);
         }
     }
@@ -199,16 +200,22 @@ class TeslaDashcamApp {
             return;
         }
 
+        const generation = this._parseGeneration;
+
         this.showLoading('Parsing telemetry data...');
 
         try {
             const result = await this.mp4Parser.parseFile(this.currentFile.file, {
                 useWorker: true,
                 onProgress: (progress) => {
+                    if (this._parseGeneration !== generation) return;
                     this.showLoading(`${progress.message} (${progress.percentage}%)`);
                     this.updateProgressBar(progress.percentage);
                 }
             });
+
+            // Discard stale results if a newer file was selected during parsing
+            if (this._parseGeneration !== generation) return;
 
             this.hideLoading();
             this.hideProgressBar();
@@ -254,9 +261,6 @@ class TeslaDashcamApp {
                         }
                     }
 
-                    // Log statistics
-                    const stats = this.telemetryDecoder.getStatistics();
-                    console.log('Telemetry statistics:', stats);
                 } else {
                     statusEl.textContent = 'Not available (firmware 2025.44.25+ required)';
                     statusEl.style.color = 'var(--warning-color)';
@@ -264,6 +268,8 @@ class TeslaDashcamApp {
                 }
             }
         } catch (error) {
+            if (this._parseGeneration !== generation) return;
+
             this.hideLoading();
             this.hideProgressBar();
 
@@ -331,7 +337,6 @@ class TeslaDashcamApp {
         const dashboard = document.getElementById('telemetryDashboard');
         if (dashboard) {
             dashboard.classList.remove('hidden');
-            console.log('Telemetry dashboard enabled');
 
             // Apply saved visibility preference (whether to show/hide the data grid)
             this.settings.applyDashboardVisibility();
@@ -606,7 +611,6 @@ class TeslaDashcamApp {
         // Build route from all telemetry
         this.mapController.buildRouteFromTelemetry(allTelemetry);
 
-        console.log('Map initialized with GPS route');
     }
 
     /**
