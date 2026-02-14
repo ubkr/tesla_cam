@@ -7,6 +7,7 @@
 export class MP4Parser {
     constructor() {
         this.worker = null;
+        this.currentReader = null;
         this.SeiMetadata = null;
         this.enumFields = null;
     }
@@ -98,8 +99,11 @@ export class MP4Parser {
 
             // Read file as ArrayBuffer
             const reader = new FileReader();
+            this.currentReader = reader;
 
             reader.onload = (e) => {
+                this.currentReader = null;
+
                 // Check if worker is still available
                 if (!this.worker) {
                     reject(new Error('Worker was terminated before file was read'));
@@ -115,11 +119,17 @@ export class MP4Parser {
             };
 
             reader.onerror = () => {
+                this.currentReader = null;
                 if (this.worker) {
                     this.worker.terminate();
                     this.worker = null;
                 }
                 reject(new Error('Failed to read file'));
+            };
+
+            reader.onabort = () => {
+                this.currentReader = null;
+                reject(new Error('File reading was aborted'));
             };
 
             // Start reading file
@@ -133,8 +143,10 @@ export class MP4Parser {
     async parseFileDirectly(file, onProgress) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
+            this.currentReader = reader;
 
             reader.onload = async (e) => {
+                this.currentReader = null;
                 try {
                     if (onProgress) onProgress({ percentage: 25, message: 'Reading file...' });
 
@@ -165,7 +177,13 @@ export class MP4Parser {
             };
 
             reader.onerror = () => {
+                this.currentReader = null;
                 reject(new Error('Failed to read file'));
+            };
+
+            reader.onabort = () => {
+                this.currentReader = null;
+                reject(new Error('File reading was aborted'));
             };
 
             reader.readAsArrayBuffer(file);
@@ -176,6 +194,10 @@ export class MP4Parser {
      * Cancel ongoing parsing
      */
     cancel() {
+        if (this.currentReader) {
+            this.currentReader.abort();
+            this.currentReader = null;
+        }
         if (this.worker) {
             this.worker.terminate();
             this.worker = null;

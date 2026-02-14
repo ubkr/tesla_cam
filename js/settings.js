@@ -12,6 +12,12 @@ const DEFAULT_SETTINGS = {
 
 const ALLOWED_SETTINGS_KEYS = new Set(Object.keys(DEFAULT_SETTINGS));
 
+const VALID_VALUES = {
+    speedUnit: ['mph', 'kph'],
+    overlayStyle: ['detailed', 'minimal']
+};
+
+// TODO: Cache DOM element references instead of re-querying on every settings update
 export class Settings {
     constructor() {
         this.settings = { ...DEFAULT_SETTINGS };
@@ -49,7 +55,12 @@ export class Settings {
                 const filtered = {};
                 for (const key of ALLOWED_SETTINGS_KEYS) {
                     if (key in parsed) {
-                        filtered[key] = parsed[key];
+                        const value = parsed[key];
+                        // Type check: value must match the type of the default
+                        if (typeof value !== typeof DEFAULT_SETTINGS[key]) continue;
+                        // Enum check: if key has a set of valid values, enforce it
+                        if (key in VALID_VALUES && !VALID_VALUES[key].includes(value)) continue;
+                        filtered[key] = value;
                     }
                 }
                 this.settings = { ...DEFAULT_SETTINGS, ...filtered };

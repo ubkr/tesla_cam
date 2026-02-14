@@ -3,6 +3,18 @@
  * Initializes and coordinates all modules
  */
 
+// TODO: No automated tests — add unit tests for TelemetryDecoder, Settings, FileLoader;
+// integration tests for MP4Parser.
+//
+// Known technical debt (see individual TODO comments):
+//   - js/telemetry-decoder.js: Fragile frame rate division when durations is empty/zero
+//   - js/telemetry-decoder.js: Regen braking magic numbers should be named constants
+//   - js/app.js:updateAccelerationIndicator: Canvas rendering magic numbers (margins, scale, thresholds)
+//   - js/app.js:parseTelemetryData: Duplicate logging (console.error + console.warn for same error)
+//   - js/settings.js: DOM elements re-queried on every settings update; should cache refs
+//   - js/timeline-controller.js: sampleRate variable is actually a stride (sampleStep)
+//   - js/mp4-worker.js: Unnecessary `.*$` in regex (harmless but redundant)
+
 import { FileLoader } from './file-loader.js';
 import { VideoPlayer } from './video-player.js';
 import { MP4Parser } from './mp4-parser.js';
@@ -273,6 +285,7 @@ class TeslaDashcamApp {
             this.hideLoading();
             this.hideProgressBar();
 
+            // TODO: Remove duplicate logging — same error logged via console.error and console.warn
             console.error('Telemetry parsing error:', error);
 
             // Update telemetry status
@@ -449,6 +462,7 @@ class TeslaDashcamApp {
     /**
      * Update acceleration vector visualization
      */
+    // TODO: Extract canvas rendering magic numbers (margins, scale factor, color thresholds) into named constants
     updateAccelerationIndicator(acceleration) {
         const canvas = document.getElementById('accelCanvas');
         if (!canvas) return;
@@ -671,9 +685,15 @@ class TeslaDashcamApp {
      * Toggle settings panel
      */
     toggleSettings() {
-        // Remove 'hidden' class and toggle 'visible' class
-        this.elements.settingsPanel.classList.remove('hidden');
-        this.elements.settingsPanel.classList.toggle('visible');
+        const panel = this.elements.settingsPanel;
+        const isVisible = panel.classList.contains('visible');
+        if (isVisible) {
+            panel.classList.remove('visible');
+            panel.classList.add('hidden');
+        } else {
+            panel.classList.remove('hidden');
+            panel.classList.add('visible');
+        }
     }
 
     /**
@@ -702,6 +722,25 @@ class TeslaDashcamApp {
         this.elements.videoSection.classList.add('hidden');
         this.elements.fileLoadSection.classList.remove('hidden');
         this.elements.fileInfo.classList.add('hidden');
+    }
+
+    /**
+     * Fully tear down the application and release all resources
+     */
+    destroy() {
+        this.reset();
+        if (this.mp4Parser) {
+            this.mp4Parser.cancel();
+            this.mp4Parser = null;
+        }
+        this.telemetryDecoder = null;
+        this.settings = null;
+        this.videoPlayer = null;
+        this.fileLoader = null;
+        this.elements = null;
+        if (window.teslaDashcamApp === this) {
+            delete window.teslaDashcamApp;
+        }
     }
 }
 

@@ -45,6 +45,7 @@ export class TelemetryDecoder {
         this.telemetryIndex.clear();
         this.sortedTimestamps = [];
 
+        // TODO: Fragile frame rate division — works by accident when durations is empty/zero
         // Calculate frame rate from video config
         if (videoConfig && videoConfig.durations && videoConfig.durations.length > 0) {
             const avgFrameDuration = videoConfig.durations.reduce((a, b) => a + b, 0) / videoConfig.durations.length;
@@ -122,6 +123,7 @@ export class TelemetryDecoder {
         // Get frame sequence number
         const frameSeqNo = seiData.frameSeqNo || index;
 
+        // TODO: Extract regen braking magic numbers (-0.5, 5, 0.5) into named constants; empirical, may vary by model
         // Detect regenerative braking (engine braking)
         // Occurs when: decelerating, accelerator lifted, brake not applied, vehicle moving
         const isRegenerativeBraking = (

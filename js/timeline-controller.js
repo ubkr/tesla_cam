@@ -75,8 +75,9 @@ export class TimelineController {
         this.lastHoverUpdate = 0;
         this.hoverThrottle = 16; // ~60fps
 
-        // Bound handler for proper cleanup
+        // Bound handlers for proper cleanup
         this._handleResizeBound = this.handleResize.bind(this);
+        this._handleMouseUpBound = this._handleMouseUp.bind(this);
     }
 
     /**
@@ -158,6 +159,7 @@ export class TimelineController {
 
         const allTelemetry = this.telemetryDecoder.getAllTelemetry();
 
+        // TODO: Rename `sampleRate` to `sampleStep` — it's a stride, not a rate
         // Sample every 5th frame for performance
         const sampleRate = 5;
         this.speedData = [];
@@ -317,9 +319,7 @@ export class TimelineController {
         });
 
         // Mouse up
-        document.addEventListener('mouseup', () => {
-            this.isDragging = false;
-        });
+        document.addEventListener('mouseup', this._handleMouseUpBound);
     }
 
     /**
@@ -636,6 +636,13 @@ export class TimelineController {
     }
 
     /**
+     * Handle document mouseup (bound for cleanup)
+     */
+    _handleMouseUp() {
+        this.isDragging = false;
+    }
+
+    /**
      * Handle window resize
      */
     handleResize() {
@@ -653,6 +660,7 @@ export class TimelineController {
 
         // Remove event listeners
         window.removeEventListener('resize', this._handleResizeBound);
+        document.removeEventListener('mouseup', this._handleMouseUpBound);
 
         this.speedData = [];
         this.events = [];
