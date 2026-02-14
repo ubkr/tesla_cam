@@ -23,6 +23,11 @@ const GEAR_STATES = {
     3: 'N'
 };
 
+// Regenerative braking detection thresholds (empirical, may vary by model)
+const REGEN_DECEL_THRESHOLD = -0.5;     // m/s^2
+const REGEN_ACCEL_PEDAL_MAX = 5;        // % pedal position
+const REGEN_MIN_SPEED = 0.5;            // m/s
+
 /**
  * Tesla uses SAE-convention axes for linear acceleration:
  *   X = longitudinal (positive = forward acceleration, negative = braking)
@@ -45,8 +50,9 @@ export class TelemetryDecoder {
         this.telemetryIndex.clear();
         this.sortedTimestamps = [];
 
-        // TODO: Fragile frame rate division — works by accident when durations is empty/zero
-        // Calculate frame rate from video config
+        // Calculate frame rate from video config.
+        // Three guards ensure safe division: (1) videoConfig.durations exists,
+        // (2) it's non-empty, (3) avgFrameDuration > 0. Falls back to 30 fps default.
         if (videoConfig && videoConfig.durations && videoConfig.durations.length > 0) {
             const avgFrameDuration = videoConfig.durations.reduce((a, b) => a + b, 0) / videoConfig.durations.length;
             this.frameRate = avgFrameDuration > 0 ? 1000 / avgFrameDuration : 30;
@@ -123,14 +129,13 @@ export class TelemetryDecoder {
         // Get frame sequence number
         const frameSeqNo = seiData.frameSeqNo || index;
 
-        // TODO: Extract regen braking magic numbers (-0.5, 5, 0.5) into named constants; empirical, may vary by model
         // Detect regenerative braking (engine braking)
         // Occurs when: decelerating, accelerator lifted, brake not applied, vehicle moving
         const isRegenerativeBraking = (
-            accelX < -0.5 &&              // Decelerating (negative acceleration)
-            accelerator < 5 &&             // Accelerator pedal lifted (< 5%)
-            !brakeApplied &&               // Physical brake not pressed
-            speedMps > 0.5                 // Vehicle is moving (> 0.5 m/s)
+            accelX < REGEN_DECEL_THRESHOLD &&
+            accelerator < REGEN_ACCEL_PEDAL_MAX &&
+            !brakeApplied &&
+            speedMps > REGEN_MIN_SPEED
         );
 
         return {

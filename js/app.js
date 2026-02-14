@@ -5,15 +5,6 @@
 
 // TODO: No automated tests — add unit tests for TelemetryDecoder, Settings, FileLoader;
 // integration tests for MP4Parser.
-//
-// Known technical debt (see individual TODO comments):
-//   - js/telemetry-decoder.js: Fragile frame rate division when durations is empty/zero
-//   - js/telemetry-decoder.js: Regen braking magic numbers should be named constants
-//   - js/app.js:updateAccelerationIndicator: Canvas rendering magic numbers (margins, scale, thresholds)
-//   - js/app.js:parseTelemetryData: Duplicate logging (console.error + console.warn for same error)
-//   - js/settings.js: DOM elements re-queried on every settings update; should cache refs
-//   - js/timeline-controller.js: sampleRate variable is actually a stride (sampleStep)
-//   - js/mp4-worker.js: Unnecessary `.*$` in regex (harmless but redundant)
 
 import { FileLoader } from './file-loader.js';
 import { VideoPlayer } from './video-player.js';
@@ -285,9 +276,6 @@ class TeslaDashcamApp {
             this.hideLoading();
             this.hideProgressBar();
 
-            // TODO: Remove duplicate logging — same error logged via console.error and console.warn
-            console.error('Telemetry parsing error:', error);
-
             // Update telemetry status
             const statusEl = document.getElementById('telemetryStatus');
             if (statusEl) {
@@ -462,15 +450,23 @@ class TeslaDashcamApp {
     /**
      * Update acceleration vector visualization
      */
-    // TODO: Extract canvas rendering magic numbers (margins, scale factor, color thresholds) into named constants
     updateAccelerationIndicator(acceleration) {
         const canvas = document.getElementById('accelCanvas');
         if (!canvas) return;
 
+        // Acceleration canvas rendering constants
+        const MARGIN = 10;
+        const MAX_ACCEL = 15;           // m/s^2 (~1.5g) full scale
+        const CROSSHAIR_SIZE = 5;
+        const REF_CIRCLES = [0.33, 0.66];
+        const LIGHT_THRESHOLD = 2;      // m/s^2
+        const MODERATE_THRESHOLD = 5;   // m/s^2
+        const ARROW_MIN_ACCEL = 3;      // m/s^2
+
         const ctx = canvas.getContext('2d');
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
-        const maxRadius = centerX - 10; // Leave margin for border
+        const maxRadius = centerX - MARGIN;
 
         // Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -479,16 +475,16 @@ class TeslaDashcamApp {
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.moveTo(centerX - 5, centerY);
-        ctx.lineTo(centerX + 5, centerY);
-        ctx.moveTo(centerX, centerY - 5);
-        ctx.lineTo(centerX, centerY + 5);
+        ctx.moveTo(centerX - CROSSHAIR_SIZE, centerY);
+        ctx.lineTo(centerX + CROSSHAIR_SIZE, centerY);
+        ctx.moveTo(centerX, centerY - CROSSHAIR_SIZE);
+        ctx.lineTo(centerX, centerY + CROSSHAIR_SIZE);
         ctx.stroke();
 
         // Draw reference circles (for scale)
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
         ctx.lineWidth = 0.5;
-        [0.33, 0.66].forEach(scale => {
+        REF_CIRCLES.forEach(scale => {
             ctx.beginPath();
             ctx.arc(centerX, centerY, maxRadius * scale, 0, Math.PI * 2);
             ctx.stroke();
@@ -509,8 +505,8 @@ class TeslaDashcamApp {
         const accelHorizontal = Math.sqrt(accelX * accelX + accelY * accelY);
 
         // Scale factor: Tesla Model Y can exceed 1g during hard braking and Performance acceleration
-        // Use 1.5g (15 m/s²) as full scale to prevent clipping during hard maneuvers
-        const scaleFactor = maxRadius / 15; // 15 m/s² (~1.5g) = full radius
+        // Use 1.5g as full scale to prevent clipping during hard maneuvers
+        const scaleFactor = maxRadius / MAX_ACCEL;
 
         // Calculate vector endpoint (using horizontal components only for 2D display)
         // Note: Canvas Y-axis is inverted (down is positive), so negate accelX
@@ -533,12 +529,12 @@ class TeslaDashcamApp {
         // Color based on total 3D magnitude (green -> yellow -> red)
         // Using total magnitude ensures color represents true G-force intensity
         let vectorColor;
-        if (accelMagnitude < 2) {
-            vectorColor = '#00ff00'; // Green (light: < 0.2g)
-        } else if (accelMagnitude < 5) {
-            vectorColor = '#ffff00'; // Yellow (moderate: 0.2-0.5g)
+        if (accelMagnitude < LIGHT_THRESHOLD) {
+            vectorColor = '#00ff00'; // Green (light)
+        } else if (accelMagnitude < MODERATE_THRESHOLD) {
+            vectorColor = '#ffff00'; // Yellow (moderate)
         } else {
-            vectorColor = '#ff0000'; // Red (strong: > 0.5g)
+            vectorColor = '#ff0000'; // Red (strong)
         }
 
         // Draw the vector line
@@ -551,7 +547,7 @@ class TeslaDashcamApp {
         ctx.stroke();
 
         // Draw arrowhead (only for significant horizontal forces)
-        if (accelHorizontal > 3) { // Show arrow when horizontal acceleration > 3 m/s² (~0.3g)
+        if (accelHorizontal > ARROW_MIN_ACCEL) {
             const angle = Math.atan2(endY - centerY, endX - centerX);
             const arrowLength = 8;
             const arrowAngle = Math.PI / 6;

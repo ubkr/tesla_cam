@@ -159,12 +159,11 @@ export class TimelineController {
 
         const allTelemetry = this.telemetryDecoder.getAllTelemetry();
 
-        // TODO: Rename `sampleRate` to `sampleStep` — it's a stride, not a rate
         // Sample every 5th frame for performance
-        const sampleRate = 5;
+        const sampleStep = 5;
         this.speedData = [];
 
-        for (let i = 0; i < allTelemetry.length; i += sampleRate) {
+        for (let i = 0; i < allTelemetry.length; i += sampleStep) {
             const data = allTelemetry[i];
             this.speedData.push({
                 timestamp: data.timestamp,

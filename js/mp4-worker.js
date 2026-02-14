@@ -5,9 +5,8 @@
  */
 
 // Import dependencies (workers have their own scope)
-// TODO: Unnecessary `.*$` in regex (harmless but redundant)
 // Derive base path from worker location for subdirectory deployment support
-const _basePath = self.location.href.replace(/\/js\/mp4-worker\.js.*$/, '/');
+const _basePath = self.location.href.replace(/\/js\/mp4-worker\.js/, '/');
 importScripts(_basePath + 'lib/protobuf.min.js', _basePath + 'lib/dashcam-mp4.js');
 
 let SeiMetadata = null;

@@ -17,10 +17,10 @@ const VALID_VALUES = {
     overlayStyle: ['detailed', 'minimal']
 };
 
-// TODO: Cache DOM element references instead of re-querying on every settings update
 export class Settings {
     constructor() {
         this.settings = { ...DEFAULT_SETTINGS };
+        this.elements = {};
         this.callbacks = {
             onSpeedUnitChange: null,
             onOverlayVisibilityChange: null,
@@ -33,6 +33,14 @@ export class Settings {
      * Initialize settings from localStorage
      */
     initialize() {
+        // Cache DOM element references
+        this.elements = {
+            speedUnitSelect: document.getElementById('speedUnitSelect'),
+            overlayVisibleToggle: document.getElementById('overlayVisibleToggle'),
+            overlayStyleSelect: document.getElementById('overlayStyleSelect'),
+            timelineVisibleToggle: document.getElementById('timelineVisibleToggle')
+        };
+
         // Load settings from localStorage
         this.loadSettings();
 
@@ -41,7 +49,6 @@ export class Settings {
 
         // Apply initial settings to UI
         this.applySettingsToUI();
-
     }
 
     /**
@@ -87,33 +94,29 @@ export class Settings {
      */
     setupEventListeners() {
         // Speed unit selector
-        const speedUnitSelect = document.getElementById('speedUnitSelect');
-        if (speedUnitSelect) {
-            speedUnitSelect.addEventListener('change', (e) => {
+        if (this.elements.speedUnitSelect) {
+            this.elements.speedUnitSelect.addEventListener('change', (e) => {
                 this.setSpeedUnit(e.target.value);
             });
         }
 
         // Overlay visibility toggle
-        const overlayVisibleToggle = document.getElementById('overlayVisibleToggle');
-        if (overlayVisibleToggle) {
-            overlayVisibleToggle.addEventListener('change', (e) => {
+        if (this.elements.overlayVisibleToggle) {
+            this.elements.overlayVisibleToggle.addEventListener('change', (e) => {
                 this.setOverlayVisible(e.target.checked);
             });
         }
 
         // Overlay style selector
-        const overlayStyleSelect = document.getElementById('overlayStyleSelect');
-        if (overlayStyleSelect) {
-            overlayStyleSelect.addEventListener('change', (e) => {
+        if (this.elements.overlayStyleSelect) {
+            this.elements.overlayStyleSelect.addEventListener('change', (e) => {
                 this.setOverlayStyle(e.target.value);
             });
         }
 
         // Timeline visibility toggle
-        const timelineVisibleToggle = document.getElementById('timelineVisibleToggle');
-        if (timelineVisibleToggle) {
-            timelineVisibleToggle.addEventListener('change', (e) => {
+        if (this.elements.timelineVisibleToggle) {
+            this.elements.timelineVisibleToggle.addEventListener('change', (e) => {
                 this.setTimelineVisible(e.target.checked);
             });
         }
@@ -124,27 +127,23 @@ export class Settings {
      */
     applySettingsToUI() {
         // Speed unit
-        const speedUnitSelect = document.getElementById('speedUnitSelect');
-        if (speedUnitSelect) {
-            speedUnitSelect.value = this.settings.speedUnit;
+        if (this.elements.speedUnitSelect) {
+            this.elements.speedUnitSelect.value = this.settings.speedUnit;
         }
 
         // Overlay visibility
-        const overlayVisibleToggle = document.getElementById('overlayVisibleToggle');
-        if (overlayVisibleToggle) {
-            overlayVisibleToggle.checked = this.settings.overlayVisible;
+        if (this.elements.overlayVisibleToggle) {
+            this.elements.overlayVisibleToggle.checked = this.settings.overlayVisible;
         }
 
         // Overlay style
-        const overlayStyleSelect = document.getElementById('overlayStyleSelect');
-        if (overlayStyleSelect) {
-            overlayStyleSelect.value = this.settings.overlayStyle;
+        if (this.elements.overlayStyleSelect) {
+            this.elements.overlayStyleSelect.value = this.settings.overlayStyle;
         }
 
         // Timeline visibility
-        const timelineVisibleToggle = document.getElementById('timelineVisibleToggle');
-        if (timelineVisibleToggle) {
-            timelineVisibleToggle.checked = this.settings.timelineVisible;
+        if (this.elements.timelineVisibleToggle) {
+            this.elements.timelineVisibleToggle.checked = this.settings.timelineVisible;
         }
 
         // Apply dashboard visibility
@@ -189,16 +188,14 @@ export class Settings {
         this.applyDashboardVisibility();
 
         // Update checkbox in settings panel
-        const checkbox = document.getElementById('overlayVisibleToggle');
-        if (checkbox) {
-            checkbox.checked = visible;
+        if (this.elements.overlayVisibleToggle) {
+            this.elements.overlayVisibleToggle.checked = visible;
         }
 
         // Trigger callback
         if (this.callbacks.onOverlayVisibilityChange) {
             this.callbacks.onOverlayVisibilityChange(visible);
         }
-
     }
 
     /**
@@ -288,16 +285,14 @@ export class Settings {
         this.applyTimelineVisibility();
 
         // Update checkbox in settings panel
-        const checkbox = document.getElementById('timelineVisibleToggle');
-        if (checkbox) {
-            checkbox.checked = visible;
+        if (this.elements.timelineVisibleToggle) {
+            this.elements.timelineVisibleToggle.checked = visible;
         }
 
         // Trigger callback
         if (this.callbacks.onTimelineVisibilityChange) {
             this.callbacks.onTimelineVisibilityChange(visible);
         }
-
     }
 
     /**
